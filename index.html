@@ -229,6 +229,57 @@
         <button class="trade-route-button" id="routeTradingMission">ROUTE SNAPSHOT TO AGENT GRAPH</button>
       </div>
 
+      <section class="autonomous-agent-console" id="autoAgentConsole">
+        <div class="auto-agent-header">
+          <div class="auto-agent-identity">
+            <div class="auto-agent-orb" aria-hidden="true"><span></span></div>
+            <div>
+              <div class="trade-title">AUTONOMOUS PAPER AGENT</div>
+              <p>Start once and PARALLAX will scan the live market, pass candidates through the risk gate, and open or skip paper positions without manual trade clicks.</p>
+            </div>
+          </div>
+          <div class="auto-agent-state">
+            <span class="auto-state-dot" id="autoAgentDot"></span>
+            <strong id="autoAgentStatus">STOPPED</strong>
+          </div>
+        </div>
+
+        <div class="auto-agent-body">
+          <div class="auto-agent-metrics">
+            <div><span>NEXT SCAN</span><strong id="autoAgentNext">—</strong></div>
+            <div><span>SESSION TRADES</span><strong id="autoAgentTrades">0</strong></div>
+            <div><span>LAST DECISION</span><strong id="autoAgentDecision">WAITING</strong></div>
+            <div><span>STRATEGY</span><strong>MOMENTUM + RISK GATE</strong></div>
+          </div>
+
+          <div class="auto-agent-controls">
+            <label>
+              SCAN CADENCE
+              <select id="autoAgentCadence">
+                <option value="60">60 SEC</option>
+                <option value="120">2 MIN</option>
+                <option value="300">5 MIN</option>
+              </select>
+            </label>
+            <button class="auto-start" id="autoAgentStart">START AUTONOMOUS AGENT</button>
+            <button class="auto-stop" id="autoAgentStop" disabled>STOP</button>
+          </div>
+        </div>
+
+        <div class="auto-agent-policy">
+          <span>PAPER ONLY</span>
+          <span>10% EQUITY / ENTRY</span>
+          <span>MAX 2 OPEN</span>
+          <span>2.5% STOP</span>
+          <span>5% TAKE PROFIT</span>
+          <span>10 MIN COOLDOWN</span>
+        </div>
+
+        <div class="auto-agent-log" id="autoAgentLog">
+          <div><span>STANDBY</span><p>Agent is stopped. Start it to begin autonomous paper-trading scans.</p></div>
+        </div>
+      </section>
+
       <div class="market-strip" id="marketStrip">
         <div class="market-card loading"><span>BTC</span><strong>—</strong><small>LOADING</small></div>
         <div class="market-card loading"><span>ETH</span><strong>—</strong><small>LOADING</small></div>
