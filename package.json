@@ -5,12 +5,12 @@
   "type": "module",
   "description": "A zero-dependency multi-agent operations console with a live demo graph and optional OpenAI orchestration.",
   "scripts": {
-    "dev": "node server.js",
-    "start": "node server.js",
+    "dev": "node scripts/local-server.js",
+    "start": "node scripts/local-server.js",
     "test": "node --test",
-    "check": "node --check app.js && node --check server.js && node --check api/run.js && node --check lib/orchestrator.js"
+    "check": "node --check app.js && node --check scripts/local-server.js && node --check api/run.js && node --check lib/orchestrator.js"
   },
   "engines": {
-    "node": ">=22.0.0"
+    "node": "24.x"
   }
 }
