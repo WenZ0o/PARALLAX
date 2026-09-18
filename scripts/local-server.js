@@ -3,6 +3,8 @@ import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runMission } from '../lib/orchestrator.js';
+import marketApi from '../api/market.js';
+import walletApi from '../api/wallet.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const port = Number(process.env.PORT || 3000);
@@ -30,6 +32,7 @@ const mime = {
   '.js': 'text/javascript; charset=utf-8',
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
+  '.webp': 'image/webp',
   '.ico': 'image/x-icon',
   '.json': 'application/json; charset=utf-8'
 };
@@ -57,6 +60,14 @@ async function readJson(req) {
 const server = createServer(async (req, res) => {
   try {
     const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+
+    if (url.pathname === '/api/market' || url.pathname === '/api/wallet') {
+      const handler = url.pathname === '/api/market' ? marketApi : walletApi;
+      const apiResponse = await handler.fetch(new Request(url.toString(), { method:req.method }));
+      const body = Buffer.from(await apiResponse.arrayBuffer());
+      res.writeHead(apiResponse.status, Object.fromEntries(apiResponse.headers.entries()));
+      return res.end(body);
+    }
 
     if (url.pathname === '/api/run') {
       if (req.method !== 'POST') return send(res, 405, JSON.stringify({ error: 'Method not allowed' }));
