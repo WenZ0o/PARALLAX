@@ -67,6 +67,21 @@ CORTEX is intentionally **alive even while idle**:
 
 The animation is implemented with lightweight CSS and small pointer-state updates; no video file or animation runtime is required.
 
+### 3D-style CORTEX depth system
+
+The homepage hero now uses a lightweight **pseudo-3D depth stack** rather than treating the artwork as a flat poster:
+
+- CSS perspective with pointer-driven X/Y head rotation
+- damped mouse tracking for smooth, physical-feeling motion
+- independent back, core, foreground, particle and specular layers
+- rotating orbital rings at different Z depths
+- foreground and background particles moving at different parallax rates
+- floating floor-shadow and volumetric glow to separate CORTEX from the page
+- eye pupils track independently from the head
+- the smaller Trading Lab persona uses the same subtle 3D idle language
+
+This keeps the page dependency-free while giving CORTEX depth and presence without requiring a heavy WebGL/Three.js runtime.
+
 ## Trading Module
 
 <p align="center">

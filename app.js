@@ -1209,12 +1209,41 @@ function initCortexHeroLife() {
   const scene=document.querySelector('#heroCortex');
   if (!hero || !scene) return;
 
-  const reset=()=>{
+  const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) {
     scene.style.setProperty('--cortex-look-x','0px');
     scene.style.setProperty('--cortex-look-y','0px');
-    scene.style.setProperty('--cortex-tilt','0deg');
+    scene.style.setProperty('--cortex-rot-x','0deg');
+    scene.style.setProperty('--cortex-rot-y','0deg');
     scene.style.setProperty('--cortex-pupil-x','0px');
     scene.style.setProperty('--cortex-pupil-y','0px');
+    scene.style.setProperty('--cortex-depth-x','0px');
+    scene.style.setProperty('--cortex-depth-y','0px');
+    return;
+  }
+
+  const target={x:0,y:0,rx:0,ry:0,px:0,py:0,dx:0,dy:0};
+  const current={...target};
+  let raf=0;
+
+  const render=()=>{
+    const ease=.085;
+    for (const key of Object.keys(current)) current[key]+=(target[key]-current[key])*ease;
+
+    scene.style.setProperty('--cortex-look-x',`${current.x.toFixed(2)}px`);
+    scene.style.setProperty('--cortex-look-y',`${current.y.toFixed(2)}px`);
+    scene.style.setProperty('--cortex-rot-x',`${current.rx.toFixed(2)}deg`);
+    scene.style.setProperty('--cortex-rot-y',`${current.ry.toFixed(2)}deg`);
+    scene.style.setProperty('--cortex-pupil-x',`${current.px.toFixed(2)}px`);
+    scene.style.setProperty('--cortex-pupil-y',`${current.py.toFixed(2)}px`);
+    scene.style.setProperty('--cortex-depth-x',`${current.dx.toFixed(2)}px`);
+    scene.style.setProperty('--cortex-depth-y',`${current.dy.toFixed(2)}px`);
+
+    raf=requestAnimationFrame(render);
+  };
+
+  const reset=()=>{
+    Object.assign(target,{x:0,y:0,rx:0,ry:0,px:0,py:0,dx:0,dy:0});
   };
 
   hero.addEventListener('pointermove',(event)=>{
@@ -1222,15 +1251,24 @@ function initCortexHeroLife() {
     const nx=Math.max(-1,Math.min(1,((event.clientX-rect.left)/rect.width-.5)*2));
     const ny=Math.max(-1,Math.min(1,((event.clientY-rect.top)/rect.height-.5)*2));
 
-    scene.style.setProperty('--cortex-look-x',`${(nx*8).toFixed(2)}px`);
-    scene.style.setProperty('--cortex-look-y',`${(ny*5).toFixed(2)}px`);
-    scene.style.setProperty('--cortex-tilt',`${(nx*.65).toFixed(2)}deg`);
-    scene.style.setProperty('--cortex-pupil-x',`${(nx*3.2).toFixed(2)}px`);
-    scene.style.setProperty('--cortex-pupil-y',`${(ny*2.0).toFixed(2)}px`);
+    target.x=nx*12;
+    target.y=ny*7;
+    target.rx=-ny*5.5;
+    target.ry=nx*8.5;
+    target.px=nx*4.4;
+    target.py=ny*2.7;
+    target.dx=nx*18;
+    target.dy=ny*12;
   });
 
   hero.addEventListener('pointerleave',reset);
-  reset();
-}
+  document.addEventListener('visibilitychange',()=>{
+    if (document.hidden) reset();
+  });
 
+  reset();
+  raf=requestAnimationFrame(render);
+
+  window.addEventListener('pagehide',()=>cancelAnimationFrame(raf),{once:true});
+}
 initCortexHeroLife();

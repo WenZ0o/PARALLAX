@@ -1115,3 +1115,255 @@ textarea:focus{border-color:rgba(89,225,184,.55);box-shadow:0 0 0 3px rgba(65,20
     animation:none!important;
   }
 }
+
+
+/* ── CORTEX 3D depth upgrade ───────────────────────────────────────────── */
+.hero-cortex-scene{
+  --cortex-rot-x:0deg;
+  --cortex-rot-y:0deg;
+  --cortex-depth-x:0px;
+  --cortex-depth-y:0px;
+  perspective:1250px;
+  perspective-origin:67% 46%;
+  transform-style:preserve-3d;
+}
+.hero-cortex-stage{
+  transform-style:preserve-3d;
+  backface-visibility:hidden;
+  will-change:transform,filter;
+  animation:cortexHeroSway3D 7.4s ease-in-out infinite;
+}
+.hero-cortex-stage>img{
+  z-index:4;
+  transform:translateZ(0);
+  backface-visibility:hidden;
+  -webkit-mask-image:radial-gradient(ellipse 63% 62% at 52% 46%,#000 53%,rgba(0,0,0,.94) 66%,transparent 92%);
+  mask-image:radial-gradient(ellipse 63% 62% at 52% 46%,#000 53%,rgba(0,0,0,.94) 66%,transparent 92%);
+  box-shadow:none;
+}
+.hero-cortex-depth{
+  position:absolute;
+  inset:7%;
+  border-radius:50%;
+  pointer-events:none;
+}
+.hero-cortex-depth-back{
+  z-index:0;
+  transform:translate3d(calc(var(--cortex-depth-x) * -.45),calc(var(--cortex-depth-y) * -.45),-125px) scale(1.17);
+  background:
+    radial-gradient(circle at 50% 47%,rgba(57,255,221,.20),rgba(37,166,159,.08) 35%,transparent 68%),
+    conic-gradient(from 30deg,transparent,rgba(79,244,218,.08),transparent 32%,rgba(84,213,255,.08),transparent 67%);
+  filter:blur(20px);
+  opacity:.82;
+  animation:cortexDepthBackPulse 6.8s ease-in-out infinite;
+}
+.hero-cortex-depth-front{
+  z-index:8;
+  inset:17%;
+  transform:translate3d(calc(var(--cortex-depth-x) * .38),calc(var(--cortex-depth-y) * .38),78px) scale(.96);
+  border:1px solid rgba(112,255,231,.07);
+  background:radial-gradient(circle at 42% 32%,rgba(190,255,246,.10),transparent 38%);
+  filter:blur(6px);
+  mix-blend-mode:screen;
+  opacity:.52;
+  animation:cortexDepthFrontPulse 4.9s ease-in-out infinite;
+}
+.hero-cortex-particles{z-index:3}
+.hero-cortex-particles-back{
+  transform:translate3d(calc(var(--cortex-depth-x) * -.65),calc(var(--cortex-depth-y) * -.65),-72px);
+  opacity:.18;
+  animation:cortexHeroParticleDriftBack 24s linear infinite;
+}
+.hero-cortex-particles-front{
+  z-index:9;
+  inset:0;
+  opacity:.13;
+  background-size:51px 51px,89px 89px;
+  transform:translate3d(calc(var(--cortex-depth-x) * .55),calc(var(--cortex-depth-y) * .55),105px) scale(.92);
+  filter:drop-shadow(0 0 6px rgba(83,255,226,.45));
+  animation:cortexHeroParticleDriftFront 14s linear infinite;
+}
+.hero-cortex-orbit{
+  position:absolute;
+  left:14%;
+  top:19%;
+  width:72%;
+  height:62%;
+  border-radius:50%;
+  pointer-events:none;
+  opacity:.22;
+  border:1px solid rgba(94,238,219,.22);
+  box-shadow:inset 0 0 18px rgba(56,213,191,.035),0 0 20px rgba(56,213,191,.025);
+}
+.hero-cortex-orbit::before,.hero-cortex-orbit::after{
+  content:"";
+  position:absolute;
+  width:5px;height:5px;border-radius:50%;
+  background:#80ffe9;
+  box-shadow:0 0 10px rgba(105,255,231,.8);
+}
+.hero-cortex-orbit-a{
+  z-index:1;
+  transform:translateZ(-35px) rotateX(68deg) rotateZ(-9deg) scale(1.08);
+  animation:cortexOrbitA 17s linear infinite;
+}
+.hero-cortex-orbit-a::before{left:18%;top:4%}
+.hero-cortex-orbit-a::after{right:12%;bottom:8%}
+.hero-cortex-orbit-b{
+  z-index:7;
+  transform:translateZ(48px) rotateX(72deg) rotateZ(14deg) scale(.91);
+  border-color:rgba(103,214,255,.15);
+  animation:cortexOrbitB 12s linear infinite reverse;
+}
+.hero-cortex-orbit-b::before{right:23%;top:1%}
+.hero-cortex-orbit-b::after{left:8%;bottom:16%}
+.hero-cortex-floor-shadow{
+  position:absolute;
+  z-index:0;
+  left:24%;right:14%;bottom:8%;
+  height:9%;
+  border-radius:50%;
+  transform:translate3d(calc(var(--cortex-depth-x) * -.15),14px,-100px) rotateX(74deg);
+  background:radial-gradient(ellipse at center,rgba(56,237,207,.16),rgba(21,92,91,.07) 42%,transparent 73%);
+  filter:blur(13px);
+  opacity:.76;
+}
+.hero-cortex-specular{
+  position:absolute;
+  z-index:10;
+  inset:8% 10% 12%;
+  transform:translate3d(calc(var(--cortex-depth-x) * .32),calc(var(--cortex-depth-y) * .32),120px);
+  border-radius:44%;
+  opacity:.10;
+  mix-blend-mode:screen;
+  background:linear-gradient(120deg,transparent 20%,rgba(211,255,249,.16) 42%,transparent 54%);
+  animation:cortexSpecular 7.6s ease-in-out infinite;
+  pointer-events:none;
+}
+.hero-cortex-eye-glow{z-index:11;transform:translateZ(132px)}
+.hero-cortex-pupil{
+  z-index:12;
+  transform:translate3d(var(--cortex-pupil-x),var(--cortex-pupil-y),142px);
+}
+.hero-cortex-blink{z-index:13;transform:translateZ(145px)}
+.hero-cortex-scan{z-index:14;transform:translateZ(155px)}
+.hero-cortex-vignette{z-index:15;pointer-events:none}
+
+.cortex-visual{
+  perspective:900px;
+  transform-style:preserve-3d;
+}
+.cortex-character .cortex-visual>img{
+  transform-style:preserve-3d;
+  animation:cortexPersona3DIdle 8.6s ease-in-out infinite,cortexPersonaBreath 4.7s ease-in-out infinite;
+  -webkit-mask-image:radial-gradient(ellipse 73% 72% at 50% 47%,#000 55%,rgba(0,0,0,.95) 72%,transparent 98%);
+  mask-image:radial-gradient(ellipse 73% 72% at 50% 47%,#000 55%,rgba(0,0,0,.95) 72%,transparent 98%);
+}
+.cortex-visual::after{
+  content:"";
+  position:absolute;
+  inset:8%;
+  z-index:7;
+  border-radius:42%;
+  pointer-events:none;
+  opacity:.10;
+  mix-blend-mode:screen;
+  background:linear-gradient(118deg,transparent 28%,rgba(203,255,248,.17) 46%,transparent 58%);
+  animation:cortexPersonaSheen 7.2s ease-in-out infinite;
+}
+
+@keyframes cortexHeroSway3D{
+  0%,100%{
+    transform:
+      translate3d(calc(var(--cortex-look-x) - 4px),calc(-48% + var(--cortex-look-y) + 2px),14px)
+      rotateX(calc(var(--cortex-rot-x) - .45deg))
+      rotateY(calc(var(--cortex-rot-y) - .75deg))
+      rotateZ(-.30deg)
+      scale(1.012);
+  }
+  32%{
+    transform:
+      translate3d(calc(var(--cortex-look-x) + 2px),calc(-48% + var(--cortex-look-y) - 4px),22px)
+      rotateX(calc(var(--cortex-rot-x) + .32deg))
+      rotateY(calc(var(--cortex-rot-y) + .58deg))
+      rotateZ(.28deg)
+      scale(1.026);
+  }
+  68%{
+    transform:
+      translate3d(calc(var(--cortex-look-x) + 5px),calc(-48% + var(--cortex-look-y) + 1px),17px)
+      rotateX(calc(var(--cortex-rot-x) + .62deg))
+      rotateY(calc(var(--cortex-rot-y) + .95deg))
+      rotateZ(.42deg)
+      scale(1.018);
+  }
+}
+@keyframes cortexDepthBackPulse{
+  0%,100%{opacity:.62;filter:blur(22px) saturate(.9)}
+  50%{opacity:.90;filter:blur(17px) saturate(1.15)}
+}
+@keyframes cortexDepthFrontPulse{
+  0%,100%{opacity:.32;filter:blur(7px)}
+  50%{opacity:.62;filter:blur(4px)}
+}
+@keyframes cortexHeroParticleDriftBack{
+  to{
+    transform:translate3d(calc(var(--cortex-depth-x) * -.65 + 78px),calc(var(--cortex-depth-y) * -.65 + 117px),-72px) rotate(.35deg)
+  }
+}
+@keyframes cortexHeroParticleDriftFront{
+  to{
+    transform:translate3d(calc(var(--cortex-depth-x) * .55 - 51px),calc(var(--cortex-depth-y) * .55 + 89px),105px) scale(.92) rotate(-.45deg)
+  }
+}
+@keyframes cortexOrbitA{
+  to{transform:translateZ(-35px) rotateX(68deg) rotateZ(351deg) scale(1.08)}
+}
+@keyframes cortexOrbitB{
+  to{transform:translateZ(48px) rotateX(72deg) rotateZ(374deg) scale(.91)}
+}
+@keyframes cortexSpecular{
+  0%,100%{transform:translate3d(calc(var(--cortex-depth-x) * .32 - 20px),calc(var(--cortex-depth-y) * .32),120px);opacity:.05}
+  48%{transform:translate3d(calc(var(--cortex-depth-x) * .32 + 16px),calc(var(--cortex-depth-y) * .32 - 5px),120px);opacity:.16}
+}
+@keyframes cortexPersona3DIdle{
+  0%,100%{transform:translate3d(-3px,1px,0) rotateX(-.7deg) rotateY(-1.3deg) rotateZ(-.25deg) scale(1.015)}
+  50%{transform:translate3d(4px,-3px,12px) rotateX(.65deg) rotateY(1.45deg) rotateZ(.32deg) scale(1.027)}
+}
+@keyframes cortexPersonaSheen{
+  0%,100%{transform:translateX(-15px) rotateY(-2deg);opacity:.04}
+  50%{transform:translateX(16px) rotateY(2deg);opacity:.14}
+}
+
+.hero-cortex-scene[data-stage="watch"] .hero-cortex-orbit-a,
+.hero-cortex-scene[data-stage="notice"] .hero-cortex-orbit-a{
+  animation-duration:7s;
+  opacity:.38;
+}
+.hero-cortex-scene[data-stage="propose"] .hero-cortex-depth-front{opacity:.75}
+.hero-cortex-scene[data-stage="kill"] .hero-cortex-orbit-b{border-color:rgba(255,202,111,.34);opacity:.42}
+.hero-cortex-scene[data-stage="blocked"] .hero-cortex-depth-back,
+.hero-cortex-scene[data-stage="error"] .hero-cortex-depth-back{
+  background:radial-gradient(circle,rgba(255,91,117,.18),rgba(120,30,54,.07) 40%,transparent 72%);
+}
+.hero-cortex-scene[data-stage="queue"] .hero-cortex-depth-front{
+  opacity:.92;
+  border-color:rgba(96,255,219,.20);
+  box-shadow:0 0 34px rgba(62,237,196,.12);
+}
+
+@media(max-width:800px){
+  .hero-cortex-scene{perspective:900px}
+  .hero-cortex-orbit,.hero-cortex-specular{opacity:.12}
+}
+@media(prefers-reduced-motion:reduce){
+  .hero-cortex-depth-back,
+  .hero-cortex-depth-front,
+  .hero-cortex-particles-back,
+  .hero-cortex-particles-front,
+  .hero-cortex-orbit,
+  .hero-cortex-specular,
+  .cortex-visual::after{
+    animation:none!important;
+  }
+}
