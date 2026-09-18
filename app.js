@@ -833,6 +833,7 @@ function setCortexPersona(stage='idle', message='') {
 
   if(tradeEls.cortexCharacter) tradeEls.cortexCharacter.dataset.stage=stage;
   if(tradeEls.heroCortex) tradeEls.heroCortex.dataset.stage=stage;
+  window.setCortexStage?.(stage);
   if(tradeEls.cortexPersonaState) tradeEls.cortexPersonaState.textContent=labels[stage]||String(stage).toUpperCase();
   if(tradeEls.cortexPersonaMessage) tradeEls.cortexPersonaMessage.textContent=message||defaults[stage]||defaults.idle;
   if(tradeEls.cortexSignal) tradeEls.cortexSignal.textContent=stage==='idle'?'DORMANT':stage==='error'?'FAULT':'LIVE';

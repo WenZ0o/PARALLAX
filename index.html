@@ -12,6 +12,8 @@
   <div class="noise" aria-hidden="true"></div>
 
   <header class="cinematic-hero" id="top">
+    <canvas id="cortex3dCanvas" class="cortex-3d-canvas" aria-hidden="true"></canvas>
+    <div class="cortex-3d-fallback-note" id="cortex3dFallbackNote" hidden>WEBGL FALLBACK ACTIVE</div>
     <div class="hero-image" aria-hidden="true"></div>
     <div class="hero-cortex-scene" id="heroCortex" data-stage="idle" aria-hidden="true">
       <div class="hero-cortex-stage" id="heroCortexStage">
@@ -503,6 +505,7 @@
     </footer>
   </div>
 
+  <script type="module" src="/cortex-3d.js"></script>
   <script type="module" src="/app.js"></script>
 </body>
 </html>

@@ -9,7 +9,7 @@ await rm(dist, { recursive: true, force: true });
 await mkdir(dist, { recursive: true });
 await mkdir(join(dist, 'lib'), { recursive: true });
 
-for (const file of ['index.html', 'app.js', 'styles.css']) {
+for (const file of ['index.html', 'app.js', 'styles.css', 'cortex-3d.js']) {
   await cp(join(root, file), join(dist, file));
 }
 

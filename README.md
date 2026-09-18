@@ -80,7 +80,25 @@ The homepage hero now uses a lightweight **pseudo-3D depth stack** rather than t
 - eye pupils track independently from the head
 - the smaller Trading Lab persona uses the same subtle 3D idle language
 
-This keeps the page dependency-free while giving CORTEX depth and presence without requiring a heavy WebGL/Three.js runtime.
+The pseudo-3D version remains in the repository as a graceful fallback.
+
+### True WebGL / Three.js CORTEX
+
+The homepage eyecatcher now upgrades to a **real WebGL 3D scene** when WebGL is available:
+
+- a volumetric neural head built from thousands of 3D points
+- real internal depth nodes and neural line segments
+- rounded upper lobes instead of horn-like spikes
+- 3D eye shells, glowing rings and independent pupils
+- real 3D whisker curves
+- orbital rings rotating through different spatial planes
+- actual X/Y head rotation driven by pointer position
+- independent gaze tracking and procedural blinking
+- camera-perspective parallax from foreground, core and background geometry
+- live material/light reactions for **WATCH / NOTICE / PROPOSE / KILL / BLOCKED / QUEUE**
+- CSS CORTEX remains as a fallback if WebGL or the Three.js module is unavailable
+
+The scene is implemented in `cortex-3d.js` with Three.js loaded as an ES module from jsDelivr. No wallet or trading execution authority is added by the 3D layer.
 
 ## Trading Module
 
@@ -136,7 +154,7 @@ A public wallet address can be inspected, but it cannot authorize a transaction.
 - Guarded local paper-trading engine.
 - **Autonomous paper trader** that can run without manual Buy/Sell clicks after Start.
 - Responsive trading dashboard integrated into the same application.
-- Zero runtime npm dependencies.
+- No bundled frontend framework; Three.js is loaded as a pinned browser ES module for the WebGL CORTEX scene.
 
 ## Run locally
 
@@ -224,6 +242,7 @@ PARALLAX/
 │   ├── orchestrator.test.js
 │   └── trading.test.js
 ├── app.js
+├── cortex-3d.js
 ├── index.html
 ├── styles.css
 ├── vercel.json

@@ -1367,3 +1367,71 @@ textarea:focus{border-color:rgba(89,225,184,.55);box-shadow:0 0 0 3px rgba(65,20
     animation:none!important;
   }
 }
+
+
+/* ── True WebGL CORTEX ─────────────────────────────────────────────────── */
+.cortex-3d-canvas{
+  position:absolute;
+  z-index:0;
+  inset:82px 0 0;
+  width:100%;
+  height:calc(100% - 82px);
+  display:block;
+  opacity:0;
+  transition:opacity .65s ease;
+  pointer-events:none;
+}
+.cortex-webgl-ready .cortex-3d-canvas{opacity:1}
+.cortex-webgl-ready .hero-cortex-stage{
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .45s ease,visibility 0s linear .45s;
+}
+.cortex-webgl-ready .hero-cortex-scene{
+  z-index:2;
+  width:100%;
+  pointer-events:none;
+}
+.cortex-webgl-ready .hero-cortex-status{right:38px}
+.cortex-webgl-ready .hero-cortex-side{right:35px}
+.cortex-3d-fallback-note{
+  position:absolute;
+  z-index:4;
+  right:34px;
+  top:122px;
+  color:#715e46;
+  font:700 6px/1 ui-monospace,monospace;
+  letter-spacing:.12em;
+}
+.cortex-webgl-ready .hero-shade{
+  background:
+    linear-gradient(90deg,rgba(2,7,10,.98) 0%,rgba(2,7,10,.91) 27%,rgba(2,7,10,.45) 45%,rgba(2,7,10,.06) 66%,rgba(2,7,10,.16) 100%),
+    linear-gradient(180deg,rgba(2,6,9,.19),transparent 49%,rgba(2,7,10,.72));
+}
+.cortex-webgl-ready .cinematic-hero{
+  background:
+    radial-gradient(circle at 72% 43%,rgba(45,227,203,.10),transparent 26%),
+    radial-gradient(circle at 70% 75%,rgba(36,153,143,.07),transparent 28%),
+    linear-gradient(180deg,#02080b,#030a0e 72%,#02080b);
+}
+html[data-cortex3d-stage="kill"] .cortex-3d-canvas{
+  filter:saturate(.92) sepia(.08);
+}
+html[data-cortex3d-stage="blocked"] .cortex-3d-canvas,
+html[data-cortex3d-stage="error"] .cortex-3d-canvas{
+  filter:saturate(.88) hue-rotate(300deg);
+}
+html[data-cortex3d-stage="queue"] .cortex-3d-canvas{
+  filter:saturate(1.10) brightness(1.05);
+}
+@media(max-width:800px){
+  .cortex-3d-canvas{inset:72px 0 0;height:calc(100% - 72px);opacity:.70}
+  .cortex-webgl-ready .hero-cortex-status{right:18px}
+}
+@media(prefers-reduced-motion:reduce){
+  .cortex-3d-canvas{display:none!important}
+  .cortex-webgl-ready .hero-cortex-stage{
+    opacity:1;
+    visibility:visible;
+  }
+}
