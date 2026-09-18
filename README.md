@@ -2,73 +2,98 @@
   <img src="assets/parallax-github-hero.webp" alt="PARALLAX // Agent Operations" width="100%" />
 </p>
 
-<p align="center"><strong>One objective. A graph of specialists. A verified artifact.</strong></p>
+<p align="center"><strong>One objective. Parallel specialists. Adversarial verification. A usable artifact.</strong></p>
 
 <p align="center">
-  <code>DEMO MODE</code> · <code>LIVE AI</code> · <code>PARALLEL AGENTS</code> · <code>ADVERSARIAL VERIFICATION</code>
+  <code>DEMO MODE</code> · <code>LIVE AI</code> · <code>PARALLEL AGENTS</code> · <code>CRYPTO INTELLIGENCE</code> · <code>PAPER TRADING</code>
 </p>
 
-PARALLAX is a zero-dependency multi-agent operations console built to make orchestration visible instead of hiding it behind a chat box. It turns one mission into a bounded graph: **scope lock → planning → parallel specialists → adversarial verification → synthesis**.
+PARALLAX is a zero-dependency multi-agent operations console that makes orchestration visible instead of hiding it behind a chat box. A mission is decomposed by a planner, executed by independent specialists, audited by a separate verifier, and merged into a final synthesis.
 
-The hero above is the primary PARALLAX visual identity. The live orchestration animation is kept as a separate technical asset so the README cover stays cinematic while the runtime graph remains inspectable.
+PARALLAX now also includes a **safe crypto trading research module**: public market data, read-only Solana wallet observation, local paper positions, stop/take-profit simulation, risk limits, and one-click routing of the current trading snapshot into the agent graph.
 
-## Why it exists
+## How PARALLAX works
 
-Most agent demos optimize for the amount of work an agent appears to do. PARALLAX optimizes for **separation of concerns, inspectability, and bounded failure**.
+<p align="center">
+  <img src="assets/parallax-how-it-works.webp" alt="How PARALLAX works: objective, planner, parallel specialists, verifier, synthesis, artifact" width="100%" />
+</p>
 
-The system intentionally keeps the lead planner separate from execution, runs specialists with isolated instructions, and inserts a dedicated verification gate before the final result is released.
-
-## Execution graph
-
-![PARALLAX architecture](assets/architecture.svg)
+> Visual explainer. The runtime UI remains the source of truth for current behavior.
 
 ```text
-OBJECTIVE
-   │
-   ▼
- BRIEF
-   │
-   ▼
- PLAN
- ├────────► SIGNAL
- ├────────► SYSTEMS
- ├────────► RED TEAM
- └────────► EXECUTION
-              │
-       parallel artifacts
-              │
-              ▼
-           VERIFY
-              │
-        pass / repair
-              │
-              ▼
-          SYNTHESIS
-              │
-              ▼
-           ARTIFACT
+OBJECTIVE → BRIEF → PLAN
+                    ├─ SPECIALIST 1
+                    ├─ SPECIALIST 2
+                    ├─ SPECIALIST 3
+                    └─ SPECIALIST 4
+                          ↓
+                       VERIFY
+                          ↓
+                      SYNTHESIS
+                          ↓
+                       ARTIFACT
 ```
+
+## System architecture
+
+<p align="center">
+  <img src="assets/parallax-system-architecture.webp" alt="PARALLAX multi-agent and trading architecture" width="100%" />
+</p>
+
+Planning, execution, verification, and synthesis are separate stages. Trading context can be routed into the same graph without giving the application custody or signing authority.
+
+## Trading Module
+
+<p align="center">
+  <img src="assets/parallax-trading-module.webp" alt="PARALLAX trading module concept dashboard" width="100%" />
+</p>
+
+<sub>Concept visual; displayed balances, prices, PnL, and trade statistics in the artwork are illustrative.</sub>
+
+The live implementation is intentionally bounded:
+
+- **Live public market data** for BTC, ETH, and SOL.
+- **Provider fallback** from CoinGecko to Coinbase public market statistics.
+- **Read-only Solana wallet observation** using only a public address and `getBalance`.
+- **Local paper portfolio** persisted in browser `localStorage`.
+- **BUY / SELL paper positions** with simulated entry, mark-to-market PnL, stop loss, and take profit.
+- **Risk engine** with a 20% single-position cap, 60% total-exposure cap, and no leverage.
+- **Automatic paper stop / take-profit checks** when fresh market data arrives.
+- **Trading agent monitor** for market regime, wallet observation, exposure, and execution boundary.
+- **Route Snapshot to Agent Graph** to turn live market context and the paper portfolio into a normal PARALLAX mission.
+
+### Security boundary
+
+PARALLAX Trading does **not** contain:
+
+- seed phrase handling
+- private-key handling
+- wallet signing
+- token approvals
+- live-order submission
+- autonomous fund movement
+
+A public wallet address can be inspected, but it cannot authorize a transaction. The application never asks for a seed phrase or private key.
 
 ## What works
 
-- **Interactive mission-control UI** with an animated SVG execution graph.
-- **Deterministic Demo mode** with no API key or dependencies.
-- **Real AI mode** using the OpenAI Responses API from the server only.
-- **Dynamic planning** into 2–4 independent specialist tasks.
-- **Parallel worker execution** with isolated role prompts.
-- **Adversarial verifier** that audits contradictions, missing constraints, duplication, and unsupported claims.
-- **Final synthesis** that uses both specialist artifacts and the verifier audit.
-- **Node inspector** for assignments, dependencies, status, confidence, duration, attempts, and artifacts.
-- **Execution trace** showing each stage of a run.
-- **Bounded UI repair simulation** to demonstrate reject → repair → verify behavior.
-- **Local-first development server** written with Node's standard library.
-- **Vercel serverless endpoint** for `/api/run`.
-- **No client-side secrets**. `OPENAI_API_KEY` stays on the server.
-- **Zero npm dependencies** for the application itself.
+- Interactive mission-control UI with animated execution graph.
+- Deterministic **Demo mode** with no API key.
+- **Live AI mode** through the server-side OpenAI Responses API.
+- Dynamic planning into 2–4 specialist roles.
+- Parallel worker execution with isolated prompts.
+- Separate adversarial verifier and final synthesizer.
+- Node inspector, execution trace, metrics, and artifacts.
+- Secret redaction and model configuration validation.
+- Public crypto market endpoint: `GET /api/market`.
+- Read-only Solana balance endpoint: `GET /api/wallet?address=<PUBLIC_ADDRESS>`.
+- Guarded local paper-trading engine.
+- Responsive trading dashboard integrated into the same application.
+- Zero runtime npm dependencies.
 
 ## Run locally
 
-Requirements: **Node.js 22+**.
+Requirements: **Node.js 24.x**.
 
 ```bash
 cp .env.example .env
@@ -81,58 +106,74 @@ Open:
 http://localhost:3000
 ```
 
-Demo mode is immediately available. No key is required.
+Demo mode and the paper portfolio work without an OpenAI key. Live market and wallet reads require outbound internet access.
 
 ## Enable Live AI mode
 
-Add an API key to `.env`:
+Add the key only to the server environment:
 
 ```env
 OPENAI_API_KEY=your_key_here
 OPENAI_MODEL=gpt-5.6-luna
 ```
 
-Restart the local server and switch the UI from **DEMO** to **LIVE AI**.
+Optional custom Solana RPC:
 
-The model can be changed through `OPENAI_MODEL`. A cost-conscious model is used by default; harder missions can be routed to a stronger model.
+```env
+SOLANA_RPC_URL=https://your-rpc-endpoint.example
+```
 
-## Real AI execution flow
+Never commit a real API key, seed phrase, or private key. The browser does not receive `OPENAI_API_KEY`.
 
-1. The server freezes the submitted objective.
-2. The Planner returns a JSON plan with 2–4 specialist roles.
-3. All specialist requests are sent in parallel with `Promise.all`.
-4. A separate Verifier audits the combined artifacts.
-5. A Synthesizer resolves the verified material into the final response.
-6. The browser replays the resulting graph and exposes every artifact in the inspector.
+## API surface
 
-The browser never receives or stores `OPENAI_API_KEY`.
+| Endpoint | Method | Purpose | Secret required |
+|---|---|---|---|
+| `/api/run` | POST | Planner → workers → verifier → synthesis | OpenAI API key |
+| `/api/market` | GET | BTC / ETH / SOL public market snapshot | No |
+| `/api/wallet?address=...` | GET | Public Solana SOL balance | No |
+
+## Paper-trading risk model
+
+- starting cash: **$10,000**
+- max single position: **20% of current equity**
+- max total exposure: **60% of current equity**
+- leverage: **disabled**
+- execution: **simulated at the latest fetched public spot price**
+- persistence: **browser localStorage only**
+- real funds: **never touched**
+
+This is a simulation and research tool, not a brokerage or custody system.
 
 ## Project structure
 
 ```text
-parallax-agent-ops/
+PARALLAX/
 ├── api/
-│   └── run.js                 # Vercel serverless AI endpoint
+│   ├── run.js
+│   ├── market.js
+│   └── wallet.js
 ├── assets/
-│   ├── architecture.svg
-│   ├── parallax-agents-live.svg # animated README hero
-│   ├── parallax-logo.svg        # project identity
-│   └── parallax-hero.svg
+│   ├── parallax-github-hero.webp
+│   ├── parallax-how-it-works.webp
+│   ├── parallax-system-architecture.webp
+│   ├── parallax-trading-module.webp
+│   ├── parallax-agents-live.svg
+│   └── parallax-logo.svg
 ├── lib/
-│   └── orchestrator.js        # Planner / workers / verifier / synthesis
-├── test/
-│   └── orchestrator.test.js
-├── .github/workflows/ci.yml
-├── .env.example
-├── .gitignore
-├── app.js                     # graph state + interactions
-├── index.html
-├── LICENSE
-├── package.json
+│   ├── orchestrator.js
+│   └── trading.js
 ├── scripts/
-│   └── local-server.js        # local zero-dependency dev server
+│   ├── build.mjs
+│   └── local-server.js
+├── test/
+│   ├── orchestrator.test.js
+│   └── trading.test.js
+├── app.js
+├── index.html
 ├── styles.css
-└── vercel.json
+├── vercel.json
+└── package.json
 ```
 
 ## Verification
@@ -140,51 +181,38 @@ parallax-agent-ops/
 ```bash
 npm run check
 npm test
+npm run build
 ```
 
-The repository includes syntax checks and Node unit tests. GitHub Actions runs both on push and pull request.
+GitHub Actions runs checks and tests on pushes and pull requests.
 
 ## Deploy to Vercel
 
-1. Push this repository to GitHub.
-2. Import it into Vercel.
-3. Add `OPENAI_API_KEY` and optionally `OPENAI_MODEL` as environment variables.
-4. Deploy.
+1. Import the GitHub repository into Vercel.
+2. Add `OPENAI_API_KEY` as a **Production Secret**.
+3. Set `OPENAI_MODEL` if you want to override the default.
+4. Optionally set `SOLANA_RPC_URL`.
+5. Deploy.
 
-The static interface is served directly by Vercel's CDN and `/api/run` is handled by the Vercel Function in `api/run.js`. The local HTTP server lives under `scripts/` so Vercel does not detect it as the production app entrypoint.
+The frontend is static; AI, market, and wallet requests run through server functions.
 
 ## Design principles
 
-**Graph before prose.** The workflow is visible as a topology rather than a stream of chat messages.
+**Graph before prose.** The workflow is visible.
 
-**Planner ≠ worker.** The lead decides what work exists but does not perform specialist work.
+**Planner ≠ worker.** Decomposition and execution are separate roles.
 
-**Parallel when independent.** Workers only run concurrently when their responsibilities do not depend on each other's output.
+**Parallel when independent.** Specialists work concurrently when tasks do not depend on each other.
 
-**Verification is a separate authority.** The agent doing the work is not the final judge of whether the work is acceptable.
+**Verification is a separate authority.** Workers do not grade their own output.
 
-**Bound failures.** Retries are not infinite. A production extension should persist retry budgets and move irrecoverable runs into a HOLD state.
+**Artifacts over hidden reasoning.** PARALLAX surfaces outputs, metrics, states, and audits.
 
-**Artifacts over hidden reasoning.** PARALLAX stores useful outputs, statuses, and audits rather than exposing private chain-of-thought.
+**Secrets stay server-side.** Browser code never needs the OpenAI API key.
 
-## Production extensions
+**Public wallet data is observation, not authority.** No private key means no signing capability.
 
-The repository is deliberately compact. For a production deployment, the next layers would be:
-
-- SSE/WebSocket event streaming from the orchestrator instead of browser-side replay.
-- Durable run state in Postgres/SQLite.
-- Queueing for long-running missions.
-- Tool permissions per agent.
-- Retrieval and file-search workers.
-- Human approval gates for consequential actions.
-- Per-agent model routing and token budgets.
-- Persistent benchmark and evaluation suites.
-- Tracing via OpenTelemetry.
-- Authentication and per-user rate limits.
-
-## Inspiration
-
-The interaction model is inspired by contemporary graph-engineering discussions around dynamically decomposed multi-agent workflows. PARALLAX is an independent implementation and design, not a clone of another project's interface or code.
+**Paper first.** Trading logic is tested against simulated capital before any future execution integration is considered.
 
 ## License
 
