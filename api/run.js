@@ -1,22 +1,27 @@
 import { runMission } from '../lib/orchestrator.js';
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
-  }
-
+export async function POST(request) {
   try {
-    const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-    const objective = String(body.objective || '').trim();
+    const body = await request.json();
+    const objective = String(body?.objective || '').trim();
+
     if (!objective) {
-      res.status(400).json({ error: 'Objective is required.' });
-      return;
+      return Response.json({ error: 'Objective is required.' }, { status: 400 });
     }
 
     const data = await runMission({ objective });
-    res.status(200).json(data);
+    return Response.json(data, { status: 200 });
   } catch (error) {
-    res.status(500).json({ error: error?.message || 'Mission failed.' });
+    return Response.json(
+      { error: error?.message || 'Mission failed.' },
+      { status: 500 }
+    );
   }
+}
+
+export function GET() {
+  return Response.json(
+    { error: 'Method not allowed' },
+    { status: 405, headers: { Allow: 'POST' } }
+  );
 }
