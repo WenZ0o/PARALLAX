@@ -1,0 +1,16 @@
+{
+  "name": "parallax-agent-ops",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A zero-dependency multi-agent operations console with a live demo graph and optional OpenAI orchestration.",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "test": "node --test",
+    "check": "node --check app.js && node --check server.js && node --check api/run.js && node --check lib/orchestrator.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

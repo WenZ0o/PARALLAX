@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="640" viewBox="0 0 1400 640" role="img" aria-labelledby="title desc">
+  <title id="title">PARALLAX Agent Operations</title>
+  <desc id="desc">Mission-control style preview of the PARALLAX multi-agent graph.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#070b10"/>
+      <stop offset="1" stop-color="#0d131c"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="45%" r="55%">
+      <stop offset="0" stop-color="#66f2c0" stop-opacity="0.13"/>
+      <stop offset="1" stop-color="#66f2c0" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+  <rect width="1400" height="640" rx="28" fill="url(#bg)"/>
+  <rect width="1400" height="640" rx="28" fill="url(#glow)"/>
+  <g opacity="0.09" stroke="#93a4b8" stroke-width="1">
+    <path d="M0 80H1400M0 160H1400M0 240H1400M0 320H1400M0 400H1400M0 480H1400M0 560H1400"/>
+    <path d="M100 0V640M200 0V640M300 0V640M400 0V640M500 0V640M600 0V640M700 0V640M800 0V640M900 0V640M1000 0V640M1100 0V640M1200 0V640M1300 0V640"/>
+  </g>
+  <text x="80" y="92" fill="#8ea1b5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="19" letter-spacing="4">PARALLAX // AGENT OPERATIONS</text>
+  <text x="80" y="166" fill="#f5f7fa" font-family="Inter, ui-sans-serif, system-ui" font-size="56" font-weight="750">One objective.</text>
+  <text x="80" y="224" fill="#f5f7fa" font-family="Inter, ui-sans-serif, system-ui" font-size="56" font-weight="750">A verified graph of specialists.</text>
+  <text x="82" y="270" fill="#8ea1b5" font-family="Inter, ui-sans-serif, system-ui" font-size="21">Plan → parallel execution → adversarial review → synthesis</text>
+
+  <g filter="url(#shadow)" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
+    <g stroke="#2b3948" stroke-width="2" fill="none">
+      <path d="M705 366H790"/><path d="M910 366H990"/><path d="M1100 366H1182"/>
+      <path d="M850 400V478H1000"/><path d="M1055 400V478H1000"/>
+    </g>
+    <g fill="#0d151e" stroke="#324557" stroke-width="2">
+      <rect x="560" y="326" width="145" height="80" rx="18"/><rect x="790" y="326" width="120" height="80" rx="18"/>
+      <rect x="990" y="326" width="110" height="80" rx="18"/><rect x="1182" y="326" width="135" height="80" rx="18"/>
+      <rect x="910" y="478" width="180" height="80" rx="18"/>
+    </g>
+    <g fill="#66f2c0">
+      <circle cx="585" cy="350" r="6"/><circle cx="815" cy="350" r="6"/><circle cx="1015" cy="350" r="6"/><circle cx="1207" cy="350" r="6"/><circle cx="935" cy="502" r="6"/>
+    </g>
+    <g fill="#e8eef5" font-size="15" font-weight="700">
+      <text x="585" y="376">OBJECTIVE</text><text x="815" y="376">PLANNER</text><text x="1015" y="376">WORKERS</text><text x="1207" y="376">VERIFY</text><text x="935" y="528">SYNTHESIS</text>
+    </g>
+    <g fill="#77889a" font-size="12">
+      <text x="585" y="394">locked</text><text x="815" y="394">2–4 roles</text><text x="1015" y="394">parallel</text><text x="1207" y="394">audit</text><text x="935" y="546">artifact</text>
+    </g>
+  </g>
+
+  <g transform="translate(80 430)">
+    <rect width="390" height="120" rx="18" fill="#0c1219" stroke="#202c38"/>
+    <text x="24" y="34" fill="#728397" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" letter-spacing="2">LIVE TRACE</text>
+    <text x="24" y="64" fill="#cbd5df" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14">00:01  planner   plan accepted</text>
+    <text x="24" y="87" fill="#cbd5df" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14">00:02  workers   4 agents running</text>
+    <text x="24" y="110" fill="#66f2c0" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14">00:05  verifier  passed</text>
+  </g>
+</svg>
