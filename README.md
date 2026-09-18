@@ -121,7 +121,8 @@ parallax-agent-ops/
 ├── index.html
 ├── LICENSE
 ├── package.json
-├── server.js                  # local zero-dependency server
+├── scripts/
+│   └── local-server.js        # local zero-dependency dev server
 ├── styles.css
 └── vercel.json
 ```
@@ -142,7 +143,7 @@ The repository includes syntax checks and Node unit tests. GitHub Actions runs b
 3. Add `OPENAI_API_KEY` and optionally `OPENAI_MODEL` as environment variables.
 4. Deploy.
 
-The static interface is served from the repository root and `/api/run` is handled by `api/run.js`.
+The static interface is served directly by Vercel's CDN and `/api/run` is handled by the Vercel Function in `api/run.js`. The local HTTP server lives under `scripts/` so Vercel does not detect it as the production app entrypoint.
 
 ## Design principles
 
