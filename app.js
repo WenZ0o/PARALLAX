@@ -466,7 +466,9 @@ const tradeEls = {
   cortexPersonaMessage: $('#cortexPersonaMessage'),
   cortexPerception: $('#cortexPerception'),
   cortexRisk: $('#cortexRisk'),
-  cortexExecution: $('#cortexExecution')
+  cortexExecution: $('#cortexExecution'),
+  heroCortex: $('#heroCortex'),
+  heroCortexStatus: $('#heroCortexStatus')
 };
 
 const PAPER_STORAGE_KEY = 'parallax-paper-v1';
@@ -830,9 +832,12 @@ function setCortexPersona(stage='idle', message='') {
   };
 
   if(tradeEls.cortexCharacter) tradeEls.cortexCharacter.dataset.stage=stage;
+  if(tradeEls.heroCortex) tradeEls.heroCortex.dataset.stage=stage;
   if(tradeEls.cortexPersonaState) tradeEls.cortexPersonaState.textContent=labels[stage]||String(stage).toUpperCase();
   if(tradeEls.cortexPersonaMessage) tradeEls.cortexPersonaMessage.textContent=message||defaults[stage]||defaults.idle;
   if(tradeEls.cortexSignal) tradeEls.cortexSignal.textContent=stage==='idle'?'DORMANT':stage==='error'?'FAULT':'LIVE';
+  if(tradeEls.heroCortexStatus) tradeEls.heroCortexStatus.textContent=
+    stage==='idle'?'ALWAYS WATCHING':stage==='error'?'CORTEX FAULT':labels[stage]||'CORTEX LIVE';
   if(tradeEls.cortexPerception) tradeEls.cortexPerception.textContent=
     ['watch','notice','propose','kill','queue'].includes(stage)?'ACTIVE':stage==='idle'?'STANDBY':'MONITOR';
   if(tradeEls.cortexRisk) tradeEls.cortexRisk.textContent=
@@ -1193,3 +1198,39 @@ refreshMarketData({silent:true});
 setInterval(()=>{
   if (document.visibilityState==='visible') refreshMarketData({silent:true});
 },30000);
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PARALLAX CORTEX ambient life — permanent idle motion + pointer-aware gaze.
+// Visual only: observable agent state still comes from setCortexPersona().
+// ─────────────────────────────────────────────────────────────────────────────
+function initCortexHeroLife() {
+  const hero=document.querySelector('.cinematic-hero');
+  const scene=document.querySelector('#heroCortex');
+  if (!hero || !scene) return;
+
+  const reset=()=>{
+    scene.style.setProperty('--cortex-look-x','0px');
+    scene.style.setProperty('--cortex-look-y','0px');
+    scene.style.setProperty('--cortex-tilt','0deg');
+    scene.style.setProperty('--cortex-pupil-x','0px');
+    scene.style.setProperty('--cortex-pupil-y','0px');
+  };
+
+  hero.addEventListener('pointermove',(event)=>{
+    const rect=hero.getBoundingClientRect();
+    const nx=Math.max(-1,Math.min(1,((event.clientX-rect.left)/rect.width-.5)*2));
+    const ny=Math.max(-1,Math.min(1,((event.clientY-rect.top)/rect.height-.5)*2));
+
+    scene.style.setProperty('--cortex-look-x',`${(nx*8).toFixed(2)}px`);
+    scene.style.setProperty('--cortex-look-y',`${(ny*5).toFixed(2)}px`);
+    scene.style.setProperty('--cortex-tilt',`${(nx*.65).toFixed(2)}deg`);
+    scene.style.setProperty('--cortex-pupil-x',`${(nx*3.2).toFixed(2)}px`);
+    scene.style.setProperty('--cortex-pupil-y',`${(ny*2.0).toFixed(2)}px`);
+  });
+
+  hero.addEventListener('pointerleave',reset);
+  reset();
+}
+
+initCortexHeroLife();

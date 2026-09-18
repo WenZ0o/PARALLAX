@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="assets/parallax-github-hero.webp" alt="PARALLAX // Agent Operations" width="100%" />
+  <img src="assets/parallax-cortex.webp" alt="PARALLAX CORTEX — living autonomous agent persona" width="72%" />
 </p>
 
-<p align="center"><strong>One objective. Parallel specialists. Adversarial verification. A usable artifact.</strong></p>
+<p align="center"><strong>Watch. Notice. Propose. Kill. Queue.</strong></p>
 
 <p align="center">
   <code>DEMO MODE</code> · <code>LIVE AI</code> · <code>PARALLEL AGENTS</code> · <code>CRYPTO INTELLIGENCE</code> · <code>PARALLAX CORTEX</code>
@@ -51,6 +51,21 @@ Planning, execution, verification, and synthesis are separate stages. Trading co
 **PARALLAX CORTEX** is the visual persona of the autonomous trading agent. The live site uses this artwork as a reactive character rather than a static mascot: it wakes when the agent starts, scans while WATCH / NOTICE is active, changes state at the KILL risk gate, and flashes when a paper action reaches QUEUE.
 
 The character is connected to the same observable event pipeline shown in the interaction stream. It represents structured system state and visible actions, not hidden chain-of-thought.
+
+### Living CORTEX animation
+
+CORTEX is intentionally **alive even while idle**:
+
+- continuous subtle head sway and breathing glow
+- natural synchronized eye blinks on a permanent loop
+- ambient neural-particle drift
+- slight pointer-aware gaze / head parallax in the homepage hero
+- stronger scan animation during **WATCH / NOTICE**
+- amber risk response during **KILL**
+- red visual veto state when blocked
+- intensified teal pulse during **QUEUE / EXECUTE**
+
+The animation is implemented with lightweight CSS and small pointer-state updates; no video file or animation runtime is required.
 
 ## Trading Module
 

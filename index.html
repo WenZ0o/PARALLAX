@@ -13,6 +13,39 @@
 
   <header class="cinematic-hero" id="top">
     <div class="hero-image" aria-hidden="true"></div>
+    <div class="hero-cortex-scene" id="heroCortex" data-stage="idle" aria-hidden="true">
+      <div class="hero-cortex-stage" id="heroCortexStage">
+        <img src="/assets/parallax-cortex.webp" alt="" />
+        <div class="hero-cortex-particles"></div>
+        <div class="hero-cortex-eye-glow hero-cortex-eye-left"></div>
+        <div class="hero-cortex-eye-glow hero-cortex-eye-right"></div>
+        <div class="hero-cortex-pupil hero-cortex-pupil-left"></div>
+        <div class="hero-cortex-pupil hero-cortex-pupil-right"></div>
+        <div class="hero-cortex-blink hero-cortex-blink-left"></div>
+        <div class="hero-cortex-blink hero-cortex-blink-right"></div>
+        <div class="hero-cortex-scan"></div>
+        <div class="hero-cortex-vignette"></div>
+      </div>
+
+      <div class="hero-cortex-status">
+        <i></i>
+        <span id="heroCortexStatus">ALWAYS WATCHING</span>
+      </div>
+
+      <div class="hero-cortex-side hero-cortex-side-top">
+        <span>REAL-TIME</span>
+        <span>MULTI-MODAL</span>
+        <span>SELF-IMPROVING</span>
+        <span>RISK-AWARE</span>
+      </div>
+
+      <div class="hero-cortex-side hero-cortex-side-bottom">
+        <span>OBSERVE</span>
+        <span>REASON</span>
+        <span>ACT</span>
+        <span>IMPROVE</span>
+      </div>
+    </div>
     <div class="hero-shade" aria-hidden="true"></div>
 
     <nav class="hero-nav">
@@ -37,14 +70,14 @@
     </nav>
 
     <div class="hero-copy">
-      <div class="hero-kicker"><span></span> ADAPTIVE MULTI-AGENT CONTROL SYSTEM</div>
-      <h1>PARALLAX</h1>
-      <p class="hero-lead">Plan in parallel. Verify adversarially. Synthesize one usable artifact.</p>
-      <p class="hero-sub">A cinematic operations layer for live AI orchestration, crypto market intelligence, read-only wallet observation, and guarded paper trading.</p>
+      <div class="hero-kicker"><span></span> REAL-TIME MULTI-MODAL AI SYSTEM</div>
+      <h1><span>PARALLAX</span><em>CORTEX</em></h1>
+      <p class="hero-lead">Watch. Notice. Propose. Kill. Queue.</p>
+      <p class="hero-sub">A living agent persona for multi-agent operations and real-market observation. CORTEX stays visually alive at idle, reacts to live agent stages, and remains inside the guarded paper-trading boundary.</p>
 
       <div class="hero-actions">
-        <a class="hero-primary" href="#agent-ops">OPEN AGENT OPS</a>
-        <a class="hero-secondary" href="#trading">OPEN TRADING LAB</a>
+        <a class="hero-primary" href="#trading">OPEN CORTEX</a>
+        <a class="hero-secondary" href="#agent-ops">OPEN AGENT OPS</a>
       </div>
 
       <div class="hero-telemetry">
@@ -250,6 +283,8 @@
             <div class="cortex-network" aria-hidden="true"></div>
             <div class="cortex-eye cortex-eye-left" aria-hidden="true"></div>
             <div class="cortex-eye cortex-eye-right" aria-hidden="true"></div>
+            <div class="cortex-blink-mask cortex-blink-left" aria-hidden="true"></div>
+            <div class="cortex-blink-mask cortex-blink-right" aria-hidden="true"></div>
             <div class="cortex-scan" aria-hidden="true"></div>
             <div class="cortex-vignette" aria-hidden="true"></div>
             <div class="cortex-live-badge"><i></i><span id="cortexSignal">DORMANT</span></div>
