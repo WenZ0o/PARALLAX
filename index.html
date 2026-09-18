@@ -3,155 +3,217 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#07090d" />
-  <meta name="description" content="PARALLAX — adaptive multi-agent operations console." />
+  <meta name="theme-color" content="#061014" />
+  <meta name="description" content="PARALLAX — cinematic multi-agent operations and guarded crypto intelligence." />
   <title>PARALLAX // Agent Operations</title>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
   <div class="noise" aria-hidden="true"></div>
-  <div class="app-shell">
-    <header class="topbar">
-      <div class="brand-block">
-        <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
-        <div>
-          <div class="eyebrow">ADAPTIVE REASONING CONTROL</div>
-          <div class="brand">PARALLAX <span>// OPS</span></div>
-        </div>
+
+  <header class="cinematic-hero" id="top">
+    <div class="hero-image" aria-hidden="true"></div>
+    <div class="hero-shade" aria-hidden="true"></div>
+
+    <nav class="hero-nav">
+      <a class="hero-brand" href="#top" aria-label="PARALLAX home">
+        <img src="/assets/parallax-logo.svg" alt="" />
+        <span>
+          <b>PARALLAX</b>
+          <small>AGENT OPERATIONS</small>
+        </span>
+      </a>
+
+      <div class="hero-links">
+        <a href="#agent-ops">AGENT OPS</a>
+        <a href="#trading">TRADING LAB</a>
+        <a href="#architecture">ARCHITECTURE</a>
       </div>
+
       <div class="top-status">
         <div class="signal"><span class="signal-dot"></span> SYSTEM ONLINE</div>
         <div class="clock" id="clock">00:00:00</div>
       </div>
-    </header>
+    </nav>
 
-    <main class="workspace">
-      <aside class="panel mission-panel">
-        <div class="section-head">
-          <div><span class="index">01</span> MISSION INPUT</div>
-          <span class="micro">CONTROL</span>
+    <div class="hero-copy">
+      <div class="hero-kicker"><span></span> ADAPTIVE MULTI-AGENT CONTROL SYSTEM</div>
+      <h1>PARALLAX</h1>
+      <p class="hero-lead">Plan in parallel. Verify adversarially. Synthesize one usable artifact.</p>
+      <p class="hero-sub">A cinematic operations layer for live AI orchestration, crypto market intelligence, read-only wallet observation, and guarded paper trading.</p>
+
+      <div class="hero-actions">
+        <a class="hero-primary" href="#agent-ops">OPEN AGENT OPS</a>
+        <a class="hero-secondary" href="#trading">OPEN TRADING LAB</a>
+      </div>
+
+      <div class="hero-telemetry">
+        <div><span>ORCHESTRATION</span><strong>PLANNER → WORKERS → VERIFY</strong></div>
+        <div><span>TRADING MODE</span><strong>READ-ONLY + PAPER</strong></div>
+        <div><span>EXECUTION BOUNDARY</span><strong>NO WALLET SIGNING</strong></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <section class="capability-strip" aria-label="PARALLAX capabilities">
+      <article>
+        <span class="capability-index">01</span>
+        <div><b>LIVE AGENT GRAPH</b><small>Inspectable planner, specialists, verifier and synthesis.</small></div>
+      </article>
+      <article>
+        <span class="capability-index">02</span>
+        <div><b>ADVERSARIAL GATE</b><small>Independent verification before the final artifact ships.</small></div>
+      </article>
+      <article>
+        <span class="capability-index">03</span>
+        <div><b>CRYPTO INTELLIGENCE</b><small>Public market data, wallet observation and paper execution.</small></div>
+      </article>
+    </section>
+
+    <section class="product-section ops-section" id="agent-ops">
+      <div class="product-heading">
+        <div>
+          <span class="section-tag">01 / AGENT OPERATIONS</span>
+          <h2>Mission Control</h2>
+          <p>One objective becomes a visible specialist graph. Every stage exposes status, artifacts, verification state and timing.</p>
         </div>
-
-        <label class="field-label" for="objective">OBJECTIVE</label>
-        <textarea id="objective" spellcheck="false">Map a launch strategy for an open-source agent memory engine. Identify the strongest technical wedge, likely failure modes, distribution channels, and a 14-day execution plan.</textarea>
-        <div class="char-row"><span>Natural language mission brief</span><span id="charCount">0 / 6000</span></div>
-
-        <div class="mode-wrap">
-          <div class="field-label">EXECUTION MODE</div>
-          <div class="segmented" role="group" aria-label="Execution mode">
-            <button class="mode-btn active" data-mode="demo">DEMO</button>
-            <button class="mode-btn" data-mode="ai">LIVE AI</button>
-          </div>
-          <p class="mode-note" id="modeNote">Runs locally with deterministic simulated agents. No key required.</p>
+        <div class="heading-badges">
+          <span>DEMO MODE</span><span>LIVE AI</span><span>PARALLEL AGENTS</span><span>VERIFIER</span>
         </div>
+      </div>
 
-        <button id="runButton" class="run-button">
-          <span class="run-icon">▾</span>
-          <span id="runLabel">EXECUTE MISSION</span>
-          <span class="keycap">⌘↵</span>
-        </button>
+      <main class="workspace">
+        <aside class="panel mission-panel">
+          <div class="section-head">
+            <div><span class="index">01</span> MISSION INPUT</div>
+            <span class="micro">CONTROL</span>
+          </div>
 
-        <div class="preset-block">
-          <div class="field-label">QUICK MISSIONS</div>
-          <button class="preset" data-preset="product">PRODUCT / LAUNCH</button>
-          <button class="preset" data-preset="research">RESEARCH / SIGNAL</button>
-          <button class="preset" data-preset="system">SYSTEM / ARCHITECTURE</button>
-        </div>
+          <label class="field-label" for="objective">OBJECTIVE</label>
+          <textarea id="objective" spellcheck="false">Map a launch strategy for an open-source agent memory engine. Identify the strongest technical wedge, likely failure modes, distribution channels, and a 14-day execution plan.</textarea>
+          <div class="char-row"><span>Natural language mission brief</span><span id="charCount">0 / 6000</span></div>
 
-        <div class="system-spec">
-          <div class="spec-row"><span>MAX AGENTS</span><strong>04</strong></div>
-          <div class="spec-row"><span>RETRY LIMIT</span><strong>02</strong></div>
-          <div class="spec-row"><span>MEMORY</span><strong>ISOLATED</strong></div>
-          <div class="spec-row"><span>GATE</span><strong>ADVERSARIAL</strong></div>
-        </div>
-      </aside>
-
-      <section class="center-stage">
-        <div class="hud-row">
-          <div class="hud-card">
-            <span>STATE</span>
-            <strong id="metricState">IDLE</strong>
-          </div>
-          <div class="hud-card">
-            <span>ACTIVE</span>
-            <strong id="metricActive">0</strong>
-          </div>
-          <div class="hud-card">
-            <span>COMPLETED</span>
-            <strong id="metricComplete">0 / 9</strong>
-          </div>
-          <div class="hud-card">
-            <span>ELAPSED</span>
-            <strong id="metricElapsed">00.0s</strong>
-          </div>
-          <div class="hud-card accent">
-            <span>TOKENS</span>
-            <strong id="metricTokens">—</strong>
-          </div>
-        </div>
-
-        <div class="graph-frame">
-          <div class="graph-title-row">
-            <div>
-              <span class="pulse-dot"></span>
-              <span id="graphStatus">GRAPH STANDBY</span>
+          <div class="mode-wrap">
+            <div class="field-label">EXECUTION MODE</div>
+            <div class="segmented" role="group" aria-label="Execution mode">
+              <button class="mode-btn active" data-mode="demo">DEMO</button>
+              <button class="mode-btn" data-mode="ai">LIVE AI</button>
             </div>
-            <div class="graph-tools"><span>PARALLEL WIDTH</span><b id="parallelWidth">04</b></div>
+            <p class="mode-note" id="modeNote">Runs locally with deterministic simulated agents. No key required.</p>
           </div>
-          <div id="graph" class="graph" role="img" aria-label="Multi-agent workflow graph"></div>
-          <div class="graph-legend">
-            <span><i class="legend idle"></i>IDLE</span>
-            <span><i class="legend running"></i>RUNNING</span>
-            <span><i class="legend complete"></i>COMPLETE</span>
-            <span><i class="legend review"></i>REVIEW</span>
-            <span><i class="legend blocked"></i>BLOCKED</span>
-          </div>
-        </div>
 
-        <div class="result-frame">
-          <div class="section-head result-head">
-            <div><span class="index">03</span> SYNTHESIS ARTIFACT</div>
-            <button id="copyResult" class="ghost-button">COPY</button>
+          <button id="runButton" class="run-button">
+            <span class="run-icon">◆</span>
+            <span id="runLabel">EXECUTE MISSION</span>
+            <span class="keycap">⌘↵</span>
+          </button>
+
+          <div class="preset-block">
+            <div class="field-label">QUICK MISSIONS</div>
+            <button class="preset" data-preset="product">PRODUCT / LAUNCH</button>
+            <button class="preset" data-preset="research">RESEARCH / SIGNAL</button>
+            <button class="preset" data-preset="system">SYSTEM / ARCHITECTURE</button>
+            <button class="preset" data-preset="trading">CRYPTO / MARKET</button>
           </div>
-          <div id="result" class="result empty-state">
-            <div class="empty-symbol">∷</div>
-            <p>No mission artifact yet.</p>
-            <span>Execute the graph to produce a verified synthesis.</span>
+
+          <div class="system-spec">
+            <div class="spec-row"><span>MAX AGENTS</span><strong>04</strong></div>
+            <div class="spec-row"><span>RETRY LIMIT</span><strong>02</strong></div>
+            <div class="spec-row"><span>MEMORY</span><strong>ISOLATED</strong></div>
+            <div class="spec-row"><span>GATE</span><strong>ADVERSARIAL</strong></div>
           </div>
+        </aside>
+
+        <section class="center-stage">
+          <div class="hud-row">
+            <div class="hud-card"><span>STATE</span><strong id="metricState">IDLE</strong></div>
+            <div class="hud-card"><span>ACTIVE</span><strong id="metricActive">0</strong></div>
+            <div class="hud-card"><span>COMPLETED</span><strong id="metricComplete">0 / 9</strong></div>
+            <div class="hud-card"><span>ELAPSED</span><strong id="metricElapsed">00.0s</strong></div>
+            <div class="hud-card accent"><span>TOKENS</span><strong id="metricTokens">—</strong></div>
+          </div>
+
+          <div class="graph-frame">
+            <div class="graph-title-row">
+              <div><span class="pulse-dot"></span><span id="graphStatus">GRAPH STANDBY</span></div>
+              <div class="graph-tools"><span>PARALLEL WIDTH</span><b id="parallelWidth">04</b></div>
+            </div>
+            <div class="graph-core-mark" aria-hidden="true"></div>
+            <div id="graph" class="graph" role="img" aria-label="Multi-agent workflow graph"></div>
+            <div class="graph-legend">
+              <span><i class="legend idle"></i>IDLE</span>
+              <span><i class="legend running"></i>RUNNING</span>
+              <span><i class="legend complete"></i>COMPLETE</span>
+              <span><i class="legend review"></i>REVIEW</span>
+              <span><i class="legend blocked"></i>BLOCKED</span>
+            </div>
+          </div>
+
+          <div class="result-frame">
+            <div class="section-head result-head">
+              <div><span class="index">03</span> SYNTHESIS ARTIFACT</div>
+              <button id="copyResult" class="ghost-button">COPY</button>
+            </div>
+            <div id="result" class="result empty-state">
+              <div class="empty-symbol">◇</div>
+              <p>No mission artifact yet.</p>
+              <span>Execute the graph to produce a verified synthesis.</span>
+            </div>
+          </div>
+        </section>
+
+        <aside class="panel inspector-panel">
+          <div class="section-head">
+            <div><span class="index">02</span> NODE INSPECTOR</div>
+            <span class="micro" id="inspectorStatus">STANDBY</span>
+          </div>
+          <div class="node-identity">
+            <div class="node-avatar" id="inspectorAvatar">BR</div>
+            <div>
+              <div class="node-kicker" id="inspectorKicker">CONTROL NODE</div>
+              <h2 id="inspectorName">BRIEF</h2>
+            </div>
+          </div>
+          <div class="inspector-grid">
+            <div><span>STATUS</span><strong id="inspectState">IDLE</strong></div>
+            <div><span>CONFIDENCE</span><strong id="inspectConfidence">—</strong></div>
+            <div><span>ATTEMPT</span><strong id="inspectAttempt">0 / 2</strong></div>
+            <div><span>DURATION</span><strong id="inspectDuration">—</strong></div>
+          </div>
+          <div class="field-label">ASSIGNMENT</div>
+          <p class="assignment" id="inspectAssignment">Freeze the mission objective and prevent scope drift.</p>
+          <div class="field-label">LATEST ARTIFACT</div>
+          <div class="artifact-box" id="inspectArtifact">Awaiting execution signal.</div>
+          <div class="field-label">DEPENDENCIES</div>
+          <div class="dependency-list" id="inspectDeps"><span>USER OBJECTIVE</span></div>
+        </aside>
+      </main>
+
+      <section class="timeline-panel">
+        <div class="section-head timeline-head">
+          <div><span class="index">04</span> EXECUTION TRACE</div>
+          <div class="trace-meta"><span id="runId">RUN —</span><span id="eventCount">0 EVENTS</span></div>
+        </div>
+        <div class="trace" id="trace">
+          <div class="trace-empty">Waiting for mission execution.</div>
         </div>
       </section>
+    </section>
 
-      <aside class="panel inspector-panel">
-        <div class="section-head">
-          <div><span class="index">02</span> NODE INSPECTOR</div>
-          <span class="micro" id="inspectorStatus">STANDBY</span>
+    <section class="trading-panel product-section" id="trading">
+      <div class="trading-showcase">
+        <div class="trading-showcase-copy">
+          <span class="section-tag">02 / TRADING INTELLIGENCE</span>
+          <h2>Crypto Trading Lab</h2>
+          <p>Live market context meets the same agent architecture—without giving PARALLAX custody or signing authority.</p>
+          <div class="heading-badges"><span>READ ONLY</span><span>PAPER TRADING</span><span>RISK ENGINE</span></div>
         </div>
-        <div class="node-identity">
-          <div class="node-avatar" id="inspectorAvatar">BR</div>
-          <div>
-            <div class="node-kicker" id="inspectorKicker">CONTROL NODE</div>
-            <h2 id="inspectorName">BRIEF</h2>
-          </div>
-        </div>
-        <div class="inspector-grid">
-          <div><span>STATUS</span><strong id="inspectState">IDLE</strong></div>
-          <div><span>CONFIDENCE</span><strong id="inspectConfidence">—</strong></div>
-          <div><span>ATTEMPT</span><strong id="inspectAttempt">0 / 2</strong></div>
-          <div><span>DURATION</span><strong id="inspectDuration">—</strong></div>
-        </div>
-        <div class="field-label">ASSIGNMENT</div>
-        <p class="assignment" id="inspectAssignment">Freeze the mission objective and prevent scope drift.</p>
-        <div class="field-label">LATEST ARTIFACT</div>
-        <div class="artifact-box" id="inspectArtifact">Awaiting execution signal.</div>
-        <div class="field-label">DEPENDENCIES</div>
-        <div class="dependency-list" id="inspectDeps"><span>USER OBJECTIVE</span></div>
-      </aside>
-    </main>
+        <img src="/assets/parallax-trading-module.webp" alt="PARALLAX trading module concept visual" />
+      </div>
 
-
-    <section class="trading-panel" id="trading">
       <div class="section-head trading-head">
-        <div><span class="index">05</span> TRADING MODULE</div>
+        <div><span class="index">05</span> LIVE TRADING MODULE</div>
         <div class="trading-head-actions">
           <span class="trade-badge safe">READ-ONLY + PAPER</span>
           <span class="micro" id="marketSource">MARKET OFFLINE</span>
@@ -232,26 +294,29 @@
         </div>
       </div>
 
-      <div class="trading-disclaimer">
-        PARALLAX Trading is a research and simulation layer. It does not custody assets, connect a private key, sign transactions, or submit live orders.
+      <div class="trading-disclaimer">PARALLAX Trading is a research and simulation layer. It does not custody assets, connect a private key, sign transactions, or submit live orders.</div>
+    </section>
+
+    <section class="architecture-section product-section" id="architecture">
+      <div class="product-heading architecture-heading">
+        <div>
+          <span class="section-tag">03 / SYSTEM ARCHITECTURE</span>
+          <h2>One visual language across the entire project.</h2>
+          <p>The live site now mirrors the GitHub identity: cinematic dark surfaces, teal/cyan energy, visible topology and product-level system diagrams.</p>
+        </div>
+      </div>
+      <div class="architecture-grid">
+        <figure><img src="/assets/parallax-how-it-works.webp" alt="How PARALLAX works" /><figcaption>OBJECTIVE → PLANNER → SPECIALISTS → VERIFIER → SYNTHESIS</figcaption></figure>
+        <figure><img src="/assets/parallax-system-architecture.webp" alt="PARALLAX system architecture" /><figcaption>MULTI-AGENT ORCHESTRATION + TRADING INTELLIGENCE</figcaption></figure>
       </div>
     </section>
 
-    <section class="timeline-panel">
-      <div class="section-head timeline-head">
-        <div><span class="index">04</span> EXECUTION TRACE</div>
-        <div class="trace-meta"><span id="runId">RUN —</span><span id="eventCount">0 EVENTS</span></div>
-      </div>
-      <div class="trace" id="trace">
-        <div class="trace-empty">Waiting for mission execution.</div>
-      </div>
-    </section>
-
-    <footer>
-      <span>PARALLAX / LOCAL-FIRST AGENT ORCHESTRATION</span>
+    <footer class="site-footer">
+      <span>PARALLAX / MULTI-AGENT OPERATIONS</span>
       <span>PLANNER → WORKERS → VERIFIER → SYNTHESIS</span>
     </footer>
   </div>
+
   <script type="module" src="/app.js"></script>
 </body>
 </html>
