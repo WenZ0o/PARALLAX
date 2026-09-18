@@ -46,7 +46,8 @@ const elements = {
 const presets = {
   product: 'Map a launch strategy for an open-source agent memory engine. Identify the strongest technical wedge, likely failure modes, distribution channels, and a 14-day execution plan.',
   research: 'Investigate why adaptive multi-agent graphs can outperform fixed linear workflows. Separate strong evidence, plausible hypotheses, and implementation risks, then propose three experiments.',
-  system: 'Design a production-ready architecture for a local-first multi-agent coding system with isolated workers, adversarial verification, retry limits, observability, and safe deployment gates.'
+  system: 'Design a production-ready architecture for a local-first multi-agent coding system with isolated workers, adversarial verification, retry limits, observability, and safe deployment gates.',
+  trading: 'Analyze the current crypto market structure for BTC, ETH, and SOL. Separate observed facts from assumptions, identify downside risks and invalidation conditions, and produce a conservative paper-trading plan with explicit no-trade conditions.'
 };
 
 const baseNodes = [
