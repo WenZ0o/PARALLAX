@@ -1,10 +1,16 @@
-# PARALLAX // Agent Operations
+<p align="center">
+  <img src="assets/parallax-agents-live.svg" alt="PARALLAX live multi-agent operations graph" width="100%" />
+</p>
 
-**One objective. A graph of specialists. A verified artifact.**
+<p align="center"><strong>One objective. A graph of specialists. A verified artifact.</strong></p>
 
-PARALLAX is a zero-dependency multi-agent operations console built to make orchestration visible instead of hiding it behind a chat box. It turns one mission into a bounded graph: scope lock → planning → parallel specialists → adversarial verification → synthesis.
+<p align="center">
+  <code>DEMO MODE</code> · <code>LIVE AI</code> · <code>PARALLEL AGENTS</code> · <code>ADVERSARIAL VERIFICATION</code>
+</p>
 
-![PARALLAX preview](assets/parallax-hero.svg)
+PARALLAX is a zero-dependency multi-agent operations console built to make orchestration visible instead of hiding it behind a chat box. It turns one mission into a bounded graph: **scope lock → planning → parallel specialists → adversarial verification → synthesis**.
+
+The animated hero above mirrors the runtime model: a planner decomposes the objective, specialist agents execute independent work in parallel, a verifier audits the combined artifacts, and synthesis publishes the final result.
 
 ## Why it exists
 
@@ -109,6 +115,8 @@ parallax-agent-ops/
 │   └── run.js                 # Vercel serverless AI endpoint
 ├── assets/
 │   ├── architecture.svg
+│   ├── parallax-agents-live.svg # animated README hero
+│   ├── parallax-logo.svg        # project identity
 │   └── parallax-hero.svg
 ├── lib/
 │   └── orchestrator.js        # Planner / workers / verifier / synthesis
