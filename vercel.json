@@ -6,6 +6,12 @@
   "functions": {
     "api/run.js": {
       "maxDuration": 300
+    },
+    "api/market.js": {
+      "maxDuration": 10
+    },
+    "api/wallet.js": {
+      "maxDuration": 10
     }
   },
   "headers": [
