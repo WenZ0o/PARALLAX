@@ -5,7 +5,8 @@ import {
   calculatePaperEquity,
   validatePaperOrder,
   stopDecision,
-  deriveMarketRegime
+  deriveMarketRegime,
+  autonomousPaperDecision
 } from '../lib/trading.js';
 
 test('calculates long and short paper PnL', () => {
@@ -35,4 +36,64 @@ test('stop decisions respect trade direction', () => {
 test('market regime classifies 24h momentum', () => {
   assert.equal(deriveMarketRegime(4).label, 'MOMENTUM UP');
   assert.equal(deriveMarketRegime(-4).label, 'MOMENTUM DOWN');
+});
+
+
+test('autonomous paper agent opens the strongest eligible momentum asset', () => {
+  const decision = autonomousPaperDecision({
+    assets:[
+      { symbol:'BTC', price:100, change24h:2.4 },
+      { symbol:'ETH', price:50, change24h:-4.2 },
+      { symbol:'SOL', price:20, change24h:3.1 }
+    ],
+    state:{ cash:10000, positions:[], history:[] },
+    prices:{ BTC:100, ETH:50, SOL:20 },
+    now:1_800_000_000_000
+  });
+  assert.equal(decision.action, 'OPEN');
+  assert.equal(decision.asset, 'ETH');
+  assert.equal(decision.side, 'SELL');
+  assert.equal(decision.notional, 1000);
+});
+
+test('autonomous paper agent holds when momentum is weak', () => {
+  const decision = autonomousPaperDecision({
+    assets:[
+      { symbol:'BTC', price:100, change24h:0.5 },
+      { symbol:'ETH', price:50, change24h:-1.1 }
+    ],
+    state:{ cash:10000, positions:[], history:[] },
+    prices:{ BTC:100, ETH:50 }
+  });
+  assert.equal(decision.action, 'HOLD');
+});
+
+test('autonomous paper agent respects open-position cap and cooldown', () => {
+  const now = 1_800_000_000_000;
+  const capped = autonomousPaperDecision({
+    assets:[{ symbol:'BTC', price:100, change24h:5 }],
+    state:{
+      cash:8000,
+      positions:[
+        { asset:'ETH', side:'BUY', entryPrice:50, notional:1000 },
+        { asset:'SOL', side:'BUY', entryPrice:20, notional:1000 }
+      ],
+      history:[]
+    },
+    prices:{ BTC:100, ETH:50, SOL:20 },
+    now
+  });
+  assert.equal(capped.action, 'HOLD');
+
+  const cooling = autonomousPaperDecision({
+    assets:[{ symbol:'BTC', price:100, change24h:5 }],
+    state:{
+      cash:10000,
+      positions:[],
+      history:[{ asset:'BTC', closedAt:new Date(now - 60_000).toISOString() }]
+    },
+    prices:{ BTC:100 },
+    now
+  });
+  assert.equal(cooling.action, 'HOLD');
 });
