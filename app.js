@@ -453,7 +453,13 @@ const tradeEls = {
   autoCadence: $('#autoAgentCadence'),
   autoStart: $('#autoAgentStart'),
   autoStop: $('#autoAgentStop'),
-  autoLog: $('#autoAgentLog')
+  autoLog: $('#autoAgentLog'),
+  interactionPanel: $('#liveInteractionPanel'),
+  interactionDot: $('#interactionDot'),
+  interactionCycle: $('#interactionCycle'),
+  interactionFlow: $('#interactionFlow'),
+  interactionStream: $('#interactionStream'),
+  interactionStreamState: $('#interactionStreamState')
 };
 
 const PAPER_STORAGE_KEY = 'parallax-paper-v1';
@@ -468,6 +474,15 @@ let autoAgentCountdownTimer = null;
 let autoAgentNextAt = 0;
 let autoAgentSessionTrades = 0;
 let autoAgentEvents = [];
+let interactionCycleCounter = 0;
+let interactionEvents = [];
+let interactionStageState = {
+  watch:'idle',
+  notice:'idle',
+  propose:'idle',
+  kill:'idle',
+  queue:'idle'
+};
 
 function loadPaperState() {
   try {
@@ -724,6 +739,12 @@ function closePaperTrade(id,reason='MANUAL') {
 
   if (autoAgentRunning && position.source==='AUTO') {
     pushAutoAgentEvent(reason==='MANUAL'?'MANUAL CLOSE':'AUTO EXIT',`${position.asset} ${position.side} closed: ${reason}; PnL ${pnl>=0?'+':''}${usd(pnl)}.`);
+    pushInteractionEvent(
+      reason==='MANUAL'?'QUEUE':'KILL',
+      reason==='MANUAL'?'EXECUTION AGENT':'RISK AGENT',
+      `${position.asset} ${position.side} position closed by ${reason}. Realized paper PnL ${pnl>=0?'+':''}${usd(pnl)}.`,
+      pnl>=0?'complete':'blocked'
+    );
   }
   toast(`${position.asset} paper position closed: ${reason}.`);
 }
@@ -770,6 +791,93 @@ function routeTradingSnapshot() {
   elements.objective.scrollIntoView({behavior:'smooth',block:'center'});
   elements.objective.focus();
   toast('Trading snapshot routed to mission input.');
+}
+
+
+function resetInteractionStages() {
+  interactionStageState={watch:'idle',notice:'idle',propose:'idle',kill:'idle',queue:'idle'};
+  renderInteractionFlow();
+}
+
+function renderInteractionFlow() {
+  if (!tradeEls.interactionFlow) return;
+  tradeEls.interactionFlow.querySelectorAll('[data-interaction-stage]').forEach((node)=>{
+    const stage=node.dataset.interactionStage;
+    node.classList.remove('active','complete','blocked','hold');
+    const state=interactionStageState[stage]||'idle';
+    if (state!=='idle') node.classList.add(state);
+  });
+
+  const nodes=[...tradeEls.interactionFlow.querySelectorAll('[data-interaction-stage]')];
+  const connectors=[...tradeEls.interactionFlow.querySelectorAll('.interaction-connector')];
+  connectors.forEach((connector,index)=>{
+    const left=nodes[index]?.dataset.interactionStage;
+    const right=nodes[index+1]?.dataset.interactionStage;
+    const leftState=interactionStageState[left]||'idle';
+    const rightState=interactionStageState[right]||'idle';
+    connector.classList.toggle('live',leftState==='active'||rightState==='active');
+    connector.classList.toggle('complete',['complete','blocked','hold'].includes(leftState));
+  });
+}
+
+function setInteractionStage(stage,state='active') {
+  if (!(stage in interactionStageState)) return;
+  for (const key of Object.keys(interactionStageState)) {
+    if (interactionStageState[key]==='active' && key!==stage) interactionStageState[key]='complete';
+  }
+  interactionStageState[stage]=state;
+  renderInteractionFlow();
+}
+
+function renderInteractionStream() {
+  if (!tradeEls.interactionStream) return;
+  if (!interactionEvents.length) {
+    tradeEls.interactionStream.innerHTML='<div class="interaction-empty">Start the autonomous agent to watch the decision pipeline live.</div>';
+    return;
+  }
+  tradeEls.interactionStream.innerHTML=interactionEvents.map((event)=>`
+    <div class="interaction-event ${escapeHtml(event.tone||'neutral')}">
+      <div class="interaction-event-time">${escapeHtml(event.stamp)}</div>
+      <div class="interaction-event-stage">${escapeHtml(event.stage)}</div>
+      <div class="interaction-event-agent">${escapeHtml(event.agent)}</div>
+      <p>${escapeHtml(event.message)}</p>
+    </div>
+  `).join('');
+}
+
+function pushInteractionEvent(stage,agent,message,tone='neutral') {
+  const stamp=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  interactionEvents.unshift({
+    stage:String(stage||'EVENT').toUpperCase(),
+    agent:String(agent||'PARALLAX').toUpperCase(),
+    message,
+    tone,
+    stamp
+  });
+  interactionEvents=interactionEvents.slice(0,14);
+  renderInteractionStream();
+}
+
+function beginInteractionCycle() {
+  interactionCycleCounter+=1;
+  resetInteractionStages();
+  if (tradeEls.interactionCycle) tradeEls.interactionCycle.textContent=`CYCLE ${String(interactionCycleCounter).padStart(3,'0')}`;
+  if (tradeEls.interactionStreamState) tradeEls.interactionStreamState.textContent='LIVE';
+  tradeEls.interactionPanel?.classList.add('live');
+}
+
+function summarizeMarketForInteraction() {
+  return marketSnapshot.assets.map((asset)=>{
+    const change=Number(asset.change24h);
+    return `${asset.symbol} ${price(asset.price)} ${Number.isFinite(change)?`(${change>=0?'+':''}${change.toFixed(2)}%)`:'(24h n/a)'}`;
+  }).join(' · ');
+}
+
+function strongestMarketCandidate() {
+  return marketSnapshot.assets
+    .filter((asset)=>Number.isFinite(Number(asset.change24h)))
+    .slice()
+    .sort((a,b)=>Math.abs(Number(b.change24h))-Math.abs(Number(a.change24h)))[0]||null;
 }
 
 function pushAutoAgentEvent(label,message) {
@@ -831,14 +939,41 @@ async function runAutonomousPaperCycle() {
   autoAgentBusy=true;
   setAutoAgentUi('SCANNING');
   tradeEls.autoNext.textContent='NOW';
+  beginInteractionCycle();
 
   try {
+    setInteractionStage('watch','active');
+    pushInteractionEvent('WATCH','MARKET AGENT','Requesting a fresh BTC / ETH / SOL market snapshot.','live');
+
     const marketOk=await refreshMarketData({silent:true});
     if (!marketOk || !marketSnapshot.assets.length) {
+      setInteractionStage('watch','blocked');
+      setInteractionStage('queue','hold');
       tradeEls.autoDecision.textContent='NO DATA';
+      pushInteractionEvent('WATCH','MARKET AGENT','Market feed unavailable. Scan terminated before a proposal could be formed.','blocked');
+      pushInteractionEvent('QUEUE','EXECUTION AGENT','No paper order queued.','hold');
       pushAutoAgentEvent('HOLD','Market data is unavailable; no paper order was created.');
       return;
     }
+
+    setInteractionStage('watch','complete');
+    pushInteractionEvent('WATCH','MARKET AGENT',`Snapshot received from ${String(marketSnapshot.source).toUpperCase()}: ${summarizeMarketForInteraction()}.`,'complete');
+    await sleep(260);
+
+    setInteractionStage('notice','active');
+    const leader=strongestMarketCandidate();
+    if (leader) {
+      const change=Number(leader.change24h);
+      pushInteractionEvent(
+        'NOTICE',
+        'SIGNAL AGENT',
+        `Strongest absolute 24h move: ${leader.symbol} ${change>=0?'+':''}${change.toFixed(2)}%. Regime: ${deriveMarketRegime(change).label}.`,
+        'live'
+      );
+    } else {
+      pushInteractionEvent('NOTICE','SIGNAL AGENT','No ranked momentum candidate is available in this snapshot.','hold');
+    }
+    await sleep(260);
 
     const decision=autonomousPaperDecision({
       assets:marketSnapshot.assets,
@@ -847,11 +982,47 @@ async function runAutonomousPaperCycle() {
       now:Date.now()
     });
 
+    setInteractionStage('notice','complete');
+    setInteractionStage('propose','active');
+
     if (decision.action!=='OPEN') {
+      pushInteractionEvent('PROPOSE','STRATEGY AGENT',`No executable candidate proposed. ${decision.reason}`,'hold');
+      await sleep(220);
+      setInteractionStage('propose','hold');
+      setInteractionStage('kill',decision.reason.startsWith('Risk gate')?'blocked':'complete');
+      pushInteractionEvent(
+        'KILL',
+        'RISK AGENT',
+        decision.reason.startsWith('Risk gate')?`Veto applied: ${decision.reason}`:'Nothing to veto. Current conditions do not justify a paper entry.',
+        decision.reason.startsWith('Risk gate')?'blocked':'hold'
+      );
+      await sleep(220);
+      setInteractionStage('queue','hold');
       tradeEls.autoDecision.textContent='HOLD';
+      pushInteractionEvent('QUEUE','EXECUTION AGENT','Queue remains empty. No paper capital deployed.','hold');
       pushAutoAgentEvent('HOLD',decision.reason);
       return;
     }
+
+    pushInteractionEvent(
+      'PROPOSE',
+      'STRATEGY AGENT',
+      `${decision.side} ${decision.asset} · ${usd(decision.notional)} notional · entry ${price(decision.entryPrice)} · stop ${decision.stopPct}% · take ${decision.takePct}%. ${decision.reason}`,
+      'proposal'
+    );
+    await sleep(260);
+    setInteractionStage('propose','complete');
+
+    setInteractionStage('kill','active');
+    const beforeMetrics=calculatePaperEquity(paperState,priceMap());
+    const afterExposure=beforeMetrics.equity>0?((beforeMetrics.exposure+decision.notional)/beforeMetrics.equity)*100:0;
+    pushInteractionEvent(
+      'KILL',
+      'RISK AGENT',
+      `Policy check passed candidate sizing: autonomous entry is ${(decision.notional/Math.max(beforeMetrics.equity,1)*100).toFixed(1)}% of equity; projected exposure ${afterExposure.toFixed(1)}%.`,
+      'live'
+    );
+    await sleep(240);
 
     const opened=createPaperPosition({
       asset:decision.asset,
@@ -863,41 +1034,67 @@ async function runAutonomousPaperCycle() {
     });
 
     if (!opened.ok) {
+      setInteractionStage('kill','blocked');
+      setInteractionStage('queue','hold');
       tradeEls.autoDecision.textContent='RISK BLOCK';
+      pushInteractionEvent('KILL','RISK AGENT',`Veto: ${opened.error||'Risk gate rejected the candidate.'}`,'blocked');
+      pushInteractionEvent('QUEUE','EXECUTION AGENT','Rejected proposal was not queued.','hold');
       pushAutoAgentEvent('BLOCKED',opened.error||'Risk gate rejected the candidate.');
       return;
     }
 
+    setInteractionStage('kill','complete');
+    pushInteractionEvent('KILL','RISK AGENT','Candidate survived the kill gate. Paper execution is authorized inside the simulation boundary.','complete');
+    await sleep(220);
+
+    setInteractionStage('queue','active');
     autoAgentSessionTrades+=1;
     tradeEls.autoTrades.textContent=String(autoAgentSessionTrades);
     tradeEls.autoDecision.textContent=`${decision.side} ${decision.asset}`;
+    pushInteractionEvent(
+      'QUEUE',
+      'EXECUTION AGENT',
+      `Paper position opened: ${decision.side} ${decision.asset} ${usd(decision.notional)} at ${price(opened.position.entryPrice)}. SL ${price(opened.position.stopLossPrice)} · TP ${price(opened.position.takeProfitPrice)}.`,
+      'complete'
+    );
+    setInteractionStage('queue','complete');
     pushAutoAgentEvent(
       'EXECUTED',
       `${decision.side} ${decision.asset} paper position ${usd(decision.notional)} at ${price(opened.position.entryPrice)}. ${decision.reason}`
     );
   } catch (error) {
     tradeEls.autoDecision.textContent='ERROR';
+    if (tradeEls.interactionStreamState) tradeEls.interactionStreamState.textContent='ERROR';
+    pushInteractionEvent('SYSTEM','PARALLAX',error?.message||'Autonomous cycle failed.','blocked');
     pushAutoAgentEvent('ERROR',error?.message||'Autonomous cycle failed.');
   } finally {
     autoAgentBusy=false;
     if (autoAgentRunning) {
       setAutoAgentUi('RUNNING');
+      if (tradeEls.interactionStreamState) tradeEls.interactionStreamState.textContent='MONITORING';
       scheduleNextAutoCycle();
     } else {
       setAutoAgentUi('STOPPED');
+      if (tradeEls.interactionStreamState) tradeEls.interactionStreamState.textContent='STOPPED';
     }
   }
 }
-
 async function startAutonomousPaperAgent() {
   if (autoAgentRunning) return;
   autoAgentRunning=true;
   autoAgentSessionTrades=0;
   autoAgentEvents=[];
+  interactionEvents=[];
+  interactionCycleCounter=0;
+  resetInteractionStages();
+  renderInteractionStream();
+  if (tradeEls.interactionCycle) tradeEls.interactionCycle.textContent='CYCLE —';
+  if (tradeEls.interactionStreamState) tradeEls.interactionStreamState.textContent='STARTING';
   tradeEls.autoTrades.textContent='0';
   tradeEls.autoDecision.textContent='INITIALIZING';
   setAutoAgentUi('RUNNING');
   pushAutoAgentEvent('START','Autonomous paper agent started. Market Agent → Risk Agent → Execution Agent is active.');
+  pushInteractionEvent('SYSTEM','ORCHESTRATOR','Autonomous session started. Observable decision events will stream here in real time.','complete');
   await runAutonomousPaperCycle();
 }
 
@@ -911,6 +1108,9 @@ function stopAutonomousPaperAgent() {
   tradeEls.autoDecision.textContent='STOPPED';
   setAutoAgentUi('STOPPED');
   pushAutoAgentEvent('STOP','Autonomous paper agent stopped. Existing paper positions remain protected by normal SL/TP checks while the page is open.');
+  if (tradeEls.interactionStreamState) tradeEls.interactionStreamState.textContent='STOPPED';
+  tradeEls.interactionPanel?.classList.remove('live');
+  pushInteractionEvent('SYSTEM','ORCHESTRATOR','Autonomous session stopped by operator.','hold');
 }
 
 tradeEls.refreshMarket?.addEventListener('click',()=>refreshMarketData());
@@ -929,6 +1129,8 @@ tradeEls.paperPositions?.addEventListener('click',(event)=>{
 renderMarketStrip();
 renderPaperPortfolio();
 renderAutoAgentLog();
+renderInteractionStream();
+resetInteractionStages();
 setAutoAgentUi('STOPPED');
 refreshMarketData({silent:true});
 

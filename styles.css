@@ -522,3 +522,75 @@ textarea:focus{border-color:rgba(89,225,184,.55);box-shadow:0 0 0 3px rgba(65,20
   .auto-agent-controls label{grid-column:1/-1}
   .auto-agent-log>div{grid-template-columns:1fr}
 }
+
+
+/* ── Live agent interaction ─────────────────────────────────────────────── */
+.live-interaction-panel{
+  margin-top:14px;border:1px solid rgba(104,220,211,.13);border-radius:13px;
+  background:linear-gradient(180deg,rgba(3,12,16,.92),rgba(2,8,11,.96));overflow:hidden;
+}
+.live-interaction-panel.live{border-color:rgba(80,231,188,.30);box-shadow:inset 0 0 42px rgba(58,211,176,.025)}
+.live-interaction-head{
+  min-height:42px;padding:0 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  border-bottom:1px solid rgba(105,216,208,.08);background:rgba(7,18,22,.62);
+}
+.live-interaction-title,.live-interaction-meta{display:flex;align-items:center;gap:8px}
+.live-interaction-title{color:#b8d0cf;font:800 8px/1 ui-monospace,monospace;letter-spacing:.12em}
+.live-interaction-meta{color:#506970;font:700 7px/1 ui-monospace,monospace;letter-spacing:.11em}
+.live-interaction-dot{width:6px;height:6px;border-radius:50%;background:#40555b}
+.live-interaction-panel.live .live-interaction-dot{background:#55e6b7;box-shadow:0 0 12px rgba(85,230,183,.75);animation:autoPulse 1.2s ease-in-out infinite}
+.interaction-flow{
+  padding:14px;display:grid;grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr) 28px minmax(0,1fr) 28px minmax(0,1fr) 28px minmax(0,1fr);align-items:stretch;
+}
+.interaction-node{
+  position:relative;min-width:0;min-height:116px;padding:12px;border:1px solid rgba(97,190,188,.11);border-radius:10px;
+  background:rgba(5,15,19,.78);transition:.2s ease;overflow:hidden;
+}
+.interaction-node::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:#30474c}
+.interaction-node .interaction-index{position:absolute;right:9px;top:9px;color:#3d565d;font:700 7px/1 ui-monospace,monospace}
+.interaction-node strong{display:block;color:#9eb5b7;font:800 9px/1 ui-monospace,monospace;letter-spacing:.12em;margin-bottom:7px}
+.interaction-node small{display:block;color:#4c6970;font:700 6px/1 ui-monospace,monospace;letter-spacing:.12em;margin-bottom:10px}
+.interaction-node p{margin:0;color:#5f747b;font-size:9px;line-height:1.45}
+.interaction-node.active{border-color:rgba(102,226,255,.52);background:rgba(7,30,37,.80);box-shadow:0 0 24px rgba(90,215,242,.06)}
+.interaction-node.active::before{background:#6fe4ff;box-shadow:0 0 10px rgba(111,228,255,.7)}
+.interaction-node.active strong{color:#c8f6ff}
+.interaction-node.complete{border-color:rgba(82,225,180,.28);background:rgba(5,25,21,.67)}
+.interaction-node.complete::before{background:#56e4b7}
+.interaction-node.complete strong{color:#9aebcf}
+.interaction-node.blocked{border-color:rgba(255,113,132,.34);background:rgba(35,10,16,.55)}
+.interaction-node.blocked::before{background:#ff7488}.interaction-node.blocked strong{color:#ff9eaa}
+.interaction-node.hold{border-color:rgba(255,201,112,.20);background:rgba(29,22,9,.34)}
+.interaction-node.hold::before{background:#ffc970}.interaction-node.hold strong{color:#e8c889}
+.interaction-node.kill-node strong{letter-spacing:.18em}
+.interaction-connector{position:relative;min-width:0}
+.interaction-connector::before{content:"";position:absolute;left:4px;right:4px;top:50%;height:1px;background:#263b41}
+.interaction-connector::after{content:"";position:absolute;right:3px;top:calc(50% - 3px);width:6px;height:6px;border-top:1px solid #365158;border-right:1px solid #365158;transform:rotate(45deg)}
+.interaction-connector i{position:absolute;left:4px;top:calc(50% - 2px);width:4px;height:4px;border-radius:50%;background:#4d6970;opacity:0}
+.interaction-connector.live::before{background:rgba(106,229,255,.52);box-shadow:0 0 8px rgba(106,229,255,.22)}
+.interaction-connector.live i{opacity:1;background:#71e5ff;box-shadow:0 0 8px rgba(113,229,255,.78);animation:interactionPacket .9s linear infinite}
+.interaction-connector.complete::before{background:rgba(83,225,181,.32)}
+@keyframes interactionPacket{0%{left:4px;opacity:.2}35%{opacity:1}100%{left:calc(100% - 7px);opacity:.2}}
+.interaction-stream-shell{margin:0 14px 12px;border:1px solid rgba(100,205,200,.09);border-radius:9px;overflow:hidden;background:#030a0d}
+.interaction-stream-head{min-height:36px;padding:0 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(103,210,205,.07)}
+.interaction-stream-head>div{display:flex;align-items:center;gap:8px}.interaction-stream-head span{color:#789296;font:800 7px/1 ui-monospace,monospace;letter-spacing:.12em}.interaction-stream-head small{color:#3e585f;font:700 6px/1 ui-monospace,monospace;letter-spacing:.11em}.stream-state{color:#56dcb3!important}
+.interaction-stream{max-height:238px;overflow:auto}
+.interaction-empty{padding:18px;color:#465d64;font:700 8px/1.5 ui-monospace,monospace;text-align:center}
+.interaction-event{
+  display:grid;grid-template-columns:74px 70px 108px minmax(0,1fr);gap:10px;align-items:start;padding:9px 10px;
+  border-bottom:1px solid rgba(255,255,255,.035);font:700 7px/1.45 ui-monospace,monospace;
+}
+.interaction-event-time{color:#405a61}.interaction-event-stage{color:#68a7aa;letter-spacing:.09em}.interaction-event-agent{color:#698084;letter-spacing:.06em}.interaction-event p{margin:0;color:#809396;font-size:8px;line-height:1.45}
+.interaction-event.live .interaction-event-stage{color:#72e6ff}.interaction-event.proposal .interaction-event-stage{color:#9ac7ff}.interaction-event.complete .interaction-event-stage{color:#61e1b8}.interaction-event.blocked .interaction-event-stage{color:#ff8898}.interaction-event.hold .interaction-event-stage{color:#e5c27b}
+.interaction-boundary{padding:0 14px 12px;color:#415b61;font:700 6px/1.45 ui-monospace,monospace;letter-spacing:.08em}
+@media(max-width:1100px){
+  .interaction-flow{grid-template-columns:1fr;gap:7px}
+  .interaction-connector{height:18px}
+  .interaction-connector::before{left:50%;right:auto;top:2px;bottom:2px;width:1px;height:auto}
+  .interaction-connector::after{left:calc(50% - 3px);right:auto;top:auto;bottom:2px;transform:rotate(135deg)}
+  .interaction-connector i{left:calc(50% - 2px);top:2px;animation:interactionPacketVertical .9s linear infinite}
+  @keyframes interactionPacketVertical{0%{top:2px;opacity:.2}35%{opacity:1}100%{top:14px;opacity:.2}}
+}
+@media(max-width:720px){
+  .live-interaction-head{align-items:flex-start;padding:10px 11px;flex-direction:column}
+  .interaction-event{grid-template-columns:64px 64px 1fr}.interaction-event-agent{grid-column:3}.interaction-event p{grid-column:1/-1}
+}

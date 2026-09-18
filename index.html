@@ -275,6 +275,70 @@
           <span>10 MIN COOLDOWN</span>
         </div>
 
+        <div class="live-interaction-panel" id="liveInteractionPanel">
+          <div class="live-interaction-head">
+            <div class="live-interaction-title">
+              <span class="live-interaction-dot" id="interactionDot"></span>
+              <span>LIVE AGENT INTERACTION</span>
+            </div>
+            <div class="live-interaction-meta">
+              <span id="interactionCycle">CYCLE —</span>
+              <span>OBSERVABLE EVENTS</span>
+            </div>
+          </div>
+
+          <div class="interaction-flow" id="interactionFlow" aria-label="Autonomous trading agent interaction flow">
+            <div class="interaction-node" data-interaction-stage="watch">
+              <span class="interaction-index">01</span>
+              <strong>WATCH</strong>
+              <small>MARKET AGENT</small>
+              <p>Ingest live BTC / ETH / SOL snapshot.</p>
+            </div>
+            <div class="interaction-connector"><i></i></div>
+            <div class="interaction-node" data-interaction-stage="notice">
+              <span class="interaction-index">02</span>
+              <strong>NOTICE</strong>
+              <small>SIGNAL AGENT</small>
+              <p>Rank anomalies, momentum and regime shifts.</p>
+            </div>
+            <div class="interaction-connector"><i></i></div>
+            <div class="interaction-node" data-interaction-stage="propose">
+              <span class="interaction-index">03</span>
+              <strong>PROPOSE</strong>
+              <small>STRATEGY AGENT</small>
+              <p>Form a bounded paper-trade candidate.</p>
+            </div>
+            <div class="interaction-connector"><i></i></div>
+            <div class="interaction-node kill-node" data-interaction-stage="kill">
+              <span class="interaction-index">04</span>
+              <strong>KILL</strong>
+              <small>RISK AGENT</small>
+              <p>Reject anything that breaks the risk policy.</p>
+            </div>
+            <div class="interaction-connector"><i></i></div>
+            <div class="interaction-node" data-interaction-stage="queue">
+              <span class="interaction-index">05</span>
+              <strong>QUEUE</strong>
+              <small>EXECUTION AGENT</small>
+              <p>Execute or hold the surviving paper action.</p>
+            </div>
+          </div>
+
+          <div class="interaction-stream-shell">
+            <div class="interaction-stream-head">
+              <div><span>LIVE EVENT STREAM</span><small>WHAT THE AGENTS ARE DOING NOW</small></div>
+              <span class="stream-state" id="interactionStreamState">STANDBY</span>
+            </div>
+            <div class="interaction-stream" id="interactionStream" aria-live="polite">
+              <div class="interaction-empty">Start the autonomous agent to watch the decision pipeline live.</div>
+            </div>
+          </div>
+
+          <div class="interaction-boundary">
+            This stream exposes structured observations, proposals, risk decisions and actions — not hidden chain-of-thought.
+          </div>
+        </div>
+
         <div class="auto-agent-log" id="autoAgentLog">
           <div><span>STANDBY</span><p>Agent is stopped. Start it to begin autonomous paper-trading scans.</p></div>
         </div>

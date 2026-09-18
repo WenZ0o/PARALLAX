@@ -60,6 +60,8 @@ The live implementation is intentionally bounded:
 - **Risk engine** with a 20% single-position cap, 60% total-exposure cap, and no leverage.
 - **Automatic paper stop / take-profit checks** when fresh market data arrives.
 - **Autonomous Paper Agent** that begins scanning as soon as the user presses Start.
+- **Live Agent Interaction** view that exposes the actual observable pipeline in real time: WATCH → NOTICE → PROPOSE → KILL → QUEUE.
+- The interaction stream shows market observations, candidate proposals, risk vetoes/approvals, and paper actions without exposing hidden chain-of-thought.
 - **Automatic candidate selection** from BTC, ETH, and SOL using the strongest eligible 24h momentum.
 - **Autonomous risk-gated execution** at 10% of paper equity per entry, max 2 open autonomous positions, 10-minute per-asset cooldown, 2.5% stop loss, and 5% take profit.
 - **Start / Stop controls, scan cadence, countdown, session trade count, last decision, and live decision log.**
