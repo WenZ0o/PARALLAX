@@ -217,7 +217,40 @@ const demoArtifacts = {
   brief: 'Objective frozen. Scope: technical wedge, failure modes, distribution, and 14-day launch sequence. No autonomous external actions permitted.',
   plan: 'Four independent work packets issued: signal analysis, systems architecture, adversarial failure analysis, and execution design.',
   'agent-1': 'Signal map: strongest wedge is durable, inspectable memory for coding agents. Distribution should lead with a measurable before/after benchmark and a self-contained local demo.',
-  'agent-2': 'Architecture: append-only memory events instead of opaque transcript stuffing.\n- Relevance scoring with explicit decay.\n- Contradictions are preserved and flagged instead of silently overwritten.\n- Retrieval quality is measured with a reproducible benchmark harness.\n\n## Primary failure modes\n- Stale memory gets high confidence and contaminates later work.\n- The product demos well but cannot quantify recall precision.\n- Scope expands into a generic “AI memory platform” before one workflow is excellent.\n\n## 14-day execution\n1. Days 1–3: build the benchmark and baseline.\n2. Days 4–6: ship a local developer demo with inspectable memory events.\n3. Days 7–9: documentation, architecture diagram, three real coding-agent examples.\n4. Days 10–11: contradiction, stale-memory, and long-session stress tests.\n5. Day 12: private test with technical users.\n6. Day 13: fix benchmark failures and sharpen onboarding.\n7. Day 14: public launch with benchmark data, demo video, and known limitations.\n\n## Gate\nDo **not** optimize distribution before the benchmark produces a credible before/after result. The verifier rejected that ordering once during this run.\n\n_Analyzed objective: ${objective}_`;
+  'agent-2': 'Architecture: append-only event log → relevance scorer → contradiction registry → retrieval layer. Keep ingestion deterministic; reserve model calls for scoring and reconciliation.',
+  'agent-3': 'Risk: “memory” is crowded and vague. Primary failure modes are silent stale-context injection, unverifiable recall quality, and demos that look impressive but lack reproducible metrics.',
+  'agent-4': 'Execution: day 1–3 benchmark harness, 4–6 local demo, 7–9 docs + examples, 10–11 stress tests, 12 private testers, 13 fixes, 14 public launch.',
+  verify: 'One conflict detected: distribution plan over-indexed on broad launch before benchmark credibility. Repair requested: make benchmark evidence the launch prerequisite.',
+  synthesis: 'Merged specialist artifacts after adversarial correction. Launch is gated on a reproducible memory-retention benchmark and failure-mode disclosure.',
+  ship: 'Final artifact released to mission console.'
+};
+
+async function runDemo() {
+  const steps = [
+    async () => { setNode('brief',{status:'running',attempt:1,artifact:'Parsing objective…'}); addEvent('brief','Freezing mission scope and constraints.'); await sleep(560); setNode('brief',{status:'complete',confidence:.99,duration:548,artifact:demoArtifacts.brief}); addEvent('brief','Objective locked.','completed'); },
+    async () => { setNode('plan',{status:'running',attempt:1,artifact:'Computing dependency graph…'}); addEvent('plan','Decomposing mission into independent work packets.'); await sleep(700); setNode('plan',{status:'complete',confidence:.94,duration:687,artifact:demoArtifacts.plan}); addEvent('plan','Four specialists spawned.','completed'); },
+    async () => {
+      ['agent-1','agent-2','agent-3','agent-4'].forEach((id,i)=>setNode(id,{status:'running',attempt:1,artifact:`Worker ${i+1} operating in isolated context…`}));
+      addEvent('workers','Parallel execution width = 4.');
+      await sleep(950);
+      setNode('agent-1',{status:'complete',confidence:.91,duration:914,artifact:demoArtifacts['agent-1']}); addEvent('signal','Signal artifact emitted.','completed');
+      await sleep(180);
+      setNode('agent-2',{status:'complete',confidence:.95,duration:1087,artifact:demoArtifacts['agent-2']}); addEvent('systems','Architecture artifact emitted.','completed');
+      await sleep(180);
+      setNode('agent-4',{status:'complete',confidence:.90,duration:1254,artifact:demoArtifacts['agent-4']}); addEvent('execution','Execution sequence emitted.','completed');
+      await sleep(220);
+      setNode('agent-3',{status:'complete',confidence:.88,duration:1470,artifact:demoArtifacts['agent-3']}); addEvent('red team','Failure analysis emitted.','completed');
+    },
+    async () => { setNode('verify',{status:'review',attempt:1,artifact:'Cross-checking assumptions and contradictions…'}); addEvent('verify','Adversarial gate comparing four artifacts.','review'); await sleep(800); setNode('verify',{status:'blocked',confidence:.86,duration:781,artifact:demoArtifacts.verify}); addEvent('verify','Conflict found. Sending one bounded repair request.','blocked'); },
+    async () => { setNode('agent-4',{status:'review',attempt:2,artifact:'Repairing launch order: benchmark proof now gates public distribution.'}); addEvent('repair','EXECUTION revising launch sequence against verifier note.','review'); await sleep(650); setNode('agent-4',{status:'complete',confidence:.96,duration:642,artifact:'Repaired artifact: no public launch until benchmark suite passes and known failure modes are documented.'}); addEvent('repair','Repair accepted.','completed'); setNode('verify',{status:'complete',confidence:.96,duration:1438,artifact:'PASS. Artifacts are now consistent: benchmark credibility precedes distribution.'}); addEvent('verify','Verification gate passed.','completed'); },
+    async () => { setNode('synthesis',{status:'running',attempt:1,artifact:'Merging verified artifacts…'}); addEvent('synthesis','Building final decision artifact.'); await sleep(760); setNode('synthesis',{status:'complete',confidence:.94,duration:748,artifact:demoArtifacts.synthesis}); addEvent('synthesis','Mission artifact compiled.','completed'); },
+    async () => { setNode('ship',{status:'running',attempt:1,artifact:'Formatting release artifact…'}); addEvent('artifact','Final integrity check.'); await sleep(420); setNode('ship',{status:'complete',confidence:.99,duration:405,artifact:demoArtifacts.ship}); addEvent('artifact','Final artifact released.','completed'); }
+  ];
+
+  for (const step of steps) await step();
+
+  const objective = elements.objective.value.trim();
+  lastResultText = `# Mission Result\n\n## Decision\nLaunch the memory engine around one measurable promise: **an agent can retain useful project context across sessions without silently injecting stale or contradictory memory.**\n\n## Technical wedge\n- Append-only memory events instead of opaque transcript stuffing.\n- Relevance scoring with explicit decay.\n- Contradictions are preserved and flagged instead of silently overwritten.\n- Retrieval quality is measured with a reproducible benchmark harness.\n\n## Primary failure modes\n- Stale memory gets high confidence and contaminates later work.\n- The product demos well but cannot quantify recall precision.\n- Scope expands into a generic “AI memory platform” before one workflow is excellent.\n\n## 14-day execution\n1. Days 1–3: build the benchmark and baseline.\n2. Days 4–6: ship a local developer demo with inspectable memory events.\n3. Days 7–9: documentation, architecture diagram, three real coding-agent examples.\n4. Days 10–11: contradiction, stale-memory, and long-session stress tests.\n5. Day 12: private test with technical users.\n6. Day 13: fix benchmark failures and sharpen onboarding.\n7. Day 14: public launch with benchmark data, demo video, and known limitations.\n\n## Gate\nDo **not** optimize distribution before the benchmark produces a credible before/after result. The verifier rejected that ordering once during this run.\n\n_Analyzed objective: ${objective}_`;
   showResult(lastResultText);
   elements.metricTokens.textContent = 'SIM';
 }
