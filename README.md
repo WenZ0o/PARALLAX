@@ -10,7 +10,7 @@
 
 PARALLAX is a zero-dependency multi-agent operations console that makes orchestration visible instead of hiding it behind a chat box. A mission is decomposed by a planner, executed by independent specialists, audited by a separate verifier, and merged into a final synthesis.
 
-PARALLAX now also includes a **safe crypto trading research module**: public market data, read-only Solana wallet observation, local paper positions, stop/take-profit simulation, risk limits, and one-click routing of the current trading snapshot into the agent graph.
+PARALLAX now also includes a **guarded autonomous paper-trading agent**: public market data, read-only Solana wallet observation, automatic market scans, local paper positions, stop/take-profit simulation, risk limits, and one-click routing of the current trading snapshot into the agent graph.
 
 ## How PARALLAX works
 
@@ -59,7 +59,11 @@ The live implementation is intentionally bounded:
 - **BUY / SELL paper positions** with simulated entry, mark-to-market PnL, stop loss, and take profit.
 - **Risk engine** with a 20% single-position cap, 60% total-exposure cap, and no leverage.
 - **Automatic paper stop / take-profit checks** when fresh market data arrives.
-- **Trading agent monitor** for market regime, wallet observation, exposure, and execution boundary.
+- **Autonomous Paper Agent** that begins scanning as soon as the user presses Start.
+- **Automatic candidate selection** from BTC, ETH, and SOL using the strongest eligible 24h momentum.
+- **Autonomous risk-gated execution** at 10% of paper equity per entry, max 2 open autonomous positions, 10-minute per-asset cooldown, 2.5% stop loss, and 5% take profit.
+- **Start / Stop controls, scan cadence, countdown, session trade count, last decision, and live decision log.**
+- **Trading agent monitor** for market regime, autonomous execution state, exposure, and execution boundary.
 - **Route Snapshot to Agent Graph** to turn live market context and the paper portfolio into a normal PARALLAX mission.
 
 ### Security boundary
@@ -88,6 +92,7 @@ A public wallet address can be inspected, but it cannot authorize a transaction.
 - Public crypto market endpoint: `GET /api/market`.
 - Read-only Solana balance endpoint: `GET /api/wallet?address=<PUBLIC_ADDRESS>`.
 - Guarded local paper-trading engine.
+- **Autonomous paper trader** that can run without manual Buy/Sell clicks after Start.
 - Responsive trading dashboard integrated into the same application.
 - Zero runtime npm dependencies.
 
@@ -139,8 +144,14 @@ Never commit a real API key, seed phrase, or private key. The browser does not r
 - max single position: **20% of current equity**
 - max total exposure: **60% of current equity**
 - leverage: **disabled**
+- autonomous entry size: **10% of current paper equity**
+- autonomous max open positions: **2**
+- autonomous signal threshold: **2% absolute 24h momentum**
+- autonomous stop / take profit: **2.5% / 5%**
+- autonomous per-asset cooldown: **10 minutes**
 - execution: **simulated at the latest fetched public spot price**
 - persistence: **browser localStorage only**
+- autonomous runtime: **only after Start and while the page session is running**
 - real funds: **never touched**
 
 This is a simulation and research tool, not a brokerage or custody system.
@@ -212,7 +223,7 @@ The frontend is static; AI, market, and wallet requests run through server funct
 
 **Public wallet data is observation, not authority.** No private key means no signing capability.
 
-**Paper first.** Trading logic is tested against simulated capital before any future execution integration is considered.
+**Paper first.** The autonomous agent can make its own simulated entry decisions after Start, but the execution boundary remains paper-only and cannot sign or move real funds.
 
 ## License
 
