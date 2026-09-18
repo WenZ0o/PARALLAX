@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/parallax-agents-live.svg" alt="PARALLAX live multi-agent operations graph" width="100%" />
+  <img src="assets/parallax-github-hero.webp" alt="PARALLAX // Agent Operations" width="100%" />
 </p>
 
 <p align="center"><strong>One objective. A graph of specialists. A verified artifact.</strong></p>
@@ -10,7 +10,7 @@
 
 PARALLAX is a zero-dependency multi-agent operations console built to make orchestration visible instead of hiding it behind a chat box. It turns one mission into a bounded graph: **scope lock → planning → parallel specialists → adversarial verification → synthesis**.
 
-The animated hero above mirrors the runtime model: a planner decomposes the objective, specialist agents execute independent work in parallel, a verifier audits the combined artifacts, and synthesis publishes the final result.
+The hero above is the primary PARALLAX visual identity. The live orchestration animation is kept as a separate technical asset so the README cover stays cinematic while the runtime graph remains inspectable.
 
 ## Why it exists
 
