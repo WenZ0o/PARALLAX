@@ -148,6 +148,95 @@
       </aside>
     </main>
 
+
+    <section class="trading-panel" id="trading">
+      <div class="section-head trading-head">
+        <div><span class="index">05</span> TRADING MODULE</div>
+        <div class="trading-head-actions">
+          <span class="trade-badge safe">READ-ONLY + PAPER</span>
+          <span class="micro" id="marketSource">MARKET OFFLINE</span>
+          <button class="ghost-button" id="refreshMarket">REFRESH</button>
+        </div>
+      </div>
+
+      <div class="trading-intro">
+        <div>
+          <div class="trade-title">MARKET INTELLIGENCE / WALLET OBSERVATION / PAPER EXECUTION</div>
+          <p>Live public market data and public-address wallet reads feed a local paper-trading lab. No seed phrase, private key, wallet signature, or real-order endpoint exists in this module.</p>
+        </div>
+        <button class="trade-route-button" id="routeTradingMission">ROUTE SNAPSHOT TO AGENT GRAPH</button>
+      </div>
+
+      <div class="market-strip" id="marketStrip">
+        <div class="market-card loading"><span>BTC</span><strong>—</strong><small>LOADING</small></div>
+        <div class="market-card loading"><span>ETH</span><strong>—</strong><small>LOADING</small></div>
+        <div class="market-card loading"><span>SOL</span><strong>—</strong><small>LOADING</small></div>
+      </div>
+
+      <div class="trading-grid">
+        <article class="trade-card wallet-card">
+          <div class="trade-card-head"><span>WALLET AGENT</span><b>READ ONLY</b></div>
+          <p class="trade-copy">Inspect a public Solana address. PARALLAX requests only <code>getBalance</code>; the address is not persisted.</p>
+          <label class="field-label" for="walletAddress">SOLANA PUBLIC ADDRESS</label>
+          <div class="wallet-input-row">
+            <input id="walletAddress" class="trade-input" autocomplete="off" spellcheck="false" placeholder="Public address only — never a seed phrase" />
+            <button id="loadWallet" class="mini-action">LOAD</button>
+          </div>
+          <div class="wallet-result" id="walletResult">No wallet loaded.</div>
+        </article>
+
+        <article class="trade-card order-card">
+          <div class="trade-card-head"><span>EXECUTION AGENT</span><b>PAPER ONLY</b></div>
+          <div class="paper-form">
+            <label>ASSET<select id="paperAsset"><option>BTC</option><option>ETH</option><option>SOL</option></select></label>
+            <label>SIDE<select id="paperSide"><option>BUY</option><option>SELL</option></select></label>
+            <label>NOTIONAL USD<input id="paperNotional" type="number" min="10" step="10" value="500" /></label>
+            <label>STOP %<input id="paperStop" type="number" min="0.1" max="50" step="0.1" value="4" /></label>
+            <label>TAKE %<input id="paperTake" type="number" min="0.1" max="100" step="0.1" value="8" /></label>
+          </div>
+          <button id="paperExecute" class="paper-execute">EXECUTE PAPER ORDER</button>
+          <div class="trade-guard">GUARDRAILS: 20% MAX POSITION · 60% MAX TOTAL EXPOSURE · NO LEVERAGE</div>
+        </article>
+
+        <article class="trade-card performance-card">
+          <div class="trade-card-head"><span>RISK ENGINE</span><b id="riskState">NOMINAL</b></div>
+          <div class="performance-grid">
+            <div><span>EQUITY</span><strong id="paperEquity">$10,000.00</strong></div>
+            <div><span>CASH</span><strong id="paperCash">$10,000.00</strong></div>
+            <div><span>UNREALIZED</span><strong id="paperPnl">$0.00</strong></div>
+            <div><span>EXPOSURE</span><strong id="paperExposure">0.0%</strong></div>
+            <div><span>OPEN</span><strong id="paperOpen">0</strong></div>
+            <div><span>CLOSED</span><strong id="paperClosed">0</strong></div>
+          </div>
+          <button id="paperReset" class="reset-paper">RESET PAPER PORTFOLIO</button>
+        </article>
+      </div>
+
+      <div class="agent-monitor" id="tradeAgents">
+        <div class="trade-agent"><span>MARKET AGENT</span><strong>AWAITING LIVE DATA</strong><p>Price regime and 24h momentum.</p></div>
+        <div class="trade-agent"><span>WALLET AGENT</span><strong>READ-ONLY</strong><p>Public Solana balance observation.</p></div>
+        <div class="trade-agent"><span>RISK AGENT</span><strong>GUARDED</strong><p>Position and exposure constraints.</p></div>
+        <div class="trade-agent"><span>VERIFIER</span><strong>PAPER BOUNDARY</strong><p>No signing or real execution path.</p></div>
+      </div>
+
+      <div class="positions-card">
+        <div class="positions-head">
+          <div><span>OPEN PAPER POSITIONS</span><small id="paperStatus">LOCAL STORAGE / ZERO REAL FUNDS</small></div>
+          <span class="trade-badge">SIMULATION</span>
+        </div>
+        <div class="positions-table-wrap">
+          <table class="positions-table">
+            <thead><tr><th>ASSET</th><th>SIDE</th><th>ENTRY</th><th>MARK</th><th>NOTIONAL</th><th>PnL</th><th>SL / TP</th><th></th></tr></thead>
+            <tbody id="paperPositions"><tr><td colspan="8" class="empty-row">No paper positions open.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="trading-disclaimer">
+        PARALLAX Trading is a research and simulation layer. It does not custody assets, connect a private key, sign transactions, or submit live orders.
+      </div>
+    </section>
+
     <section class="timeline-panel">
       <div class="section-head timeline-head">
         <div><span class="index">04</span> EXECUTION TRACE</div>
