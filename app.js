@@ -4,7 +4,8 @@ import {
   calculatePaperPnl,
   validatePaperOrder,
   stopDecision,
-  deriveMarketRegime
+  deriveMarketRegime,
+  autonomousPaperDecision
 } from '/lib/trading.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -442,13 +443,31 @@ const tradeEls = {
   paperPositions: $('#paperPositions'),
   paperStatus: $('#paperStatus'),
   tradeAgents: $('#tradeAgents'),
-  routeTradingMission: $('#routeTradingMission')
+  routeTradingMission: $('#routeTradingMission'),
+  autoConsole: $('#autoAgentConsole'),
+  autoStatus: $('#autoAgentStatus'),
+  autoDot: $('#autoAgentDot'),
+  autoNext: $('#autoAgentNext'),
+  autoTrades: $('#autoAgentTrades'),
+  autoDecision: $('#autoAgentDecision'),
+  autoCadence: $('#autoAgentCadence'),
+  autoStart: $('#autoAgentStart'),
+  autoStop: $('#autoAgentStop'),
+  autoLog: $('#autoAgentLog')
 };
 
 const PAPER_STORAGE_KEY = 'parallax-paper-v1';
 let marketSnapshot = { source:'offline', updatedAt:null, assets:[] };
 let walletSnapshot = null;
 let paperState = loadPaperState();
+
+let autoAgentRunning = false;
+let autoAgentBusy = false;
+let autoAgentTimer = null;
+let autoAgentCountdownTimer = null;
+let autoAgentNextAt = 0;
+let autoAgentSessionTrades = 0;
+let autoAgentEvents = [];
 
 function loadPaperState() {
   try {
@@ -483,8 +502,13 @@ function price(value) {
   return usd(number,digits);
 }
 
-function marketBySymbol(symbol) { return marketSnapshot.assets.find((asset)=>asset.symbol===symbol); }
-function priceMap() { return Object.fromEntries(marketSnapshot.assets.map((asset)=>[asset.symbol,Number(asset.price)])); }
+function marketBySymbol(symbol) {
+  return marketSnapshot.assets.find((asset)=>asset.symbol===symbol);
+}
+
+function priceMap() {
+  return Object.fromEntries(marketSnapshot.assets.map((asset)=>[asset.symbol,Number(asset.price)]));
+}
 
 function renderMarketStrip() {
   if (!tradeEls.marketStrip) return;
@@ -512,10 +536,12 @@ function renderTradeAgents() {
   const exposurePct=metrics.equity>0?(metrics.exposure/metrics.equity)*100:0;
   const walletLine=walletSnapshot?`${walletSnapshot.sol.toFixed(4)} SOL observed`:'No public wallet loaded';
   const marketLine=leader?`${leader.symbol}: ${deriveMarketRegime(leader.change24h).label} (${Number(leader.change24h)>=0?'+':''}${Number(leader.change24h).toFixed(2)}%)`:'Awaiting live market data';
+  const executionLine=autoAgentRunning?'AUTONOMOUS PAPER ACTIVE':'PAPER EXECUTION READY';
+
   tradeEls.tradeAgents.innerHTML=`
-    <div class="trade-agent"><span>MARKET AGENT</span><strong>${escapeHtml(marketLine)}</strong><p>Public spot data. No order execution.</p></div>
-    <div class="trade-agent"><span>WALLET AGENT</span><strong>${escapeHtml(walletLine)}</strong><p>Public Solana balance only; nothing is persisted.</p></div>
-    <div class="trade-agent"><span>RISK AGENT</span><strong>${exposurePct.toFixed(1)}% EXPOSURE</strong><p>20% per position / 60% portfolio cap.</p></div>
+    <div class="trade-agent"><span>MARKET AGENT</span><strong>${escapeHtml(marketLine)}</strong><p>Public spot data and momentum screening.</p></div>
+    <div class="trade-agent"><span>EXECUTION AGENT</span><strong>${executionLine}</strong><p>${autoAgentRunning?'Scans, risk-checks and opens paper positions automatically.':'Waiting for manual or autonomous paper execution.'}</p></div>
+    <div class="trade-agent"><span>RISK AGENT</span><strong>${exposurePct.toFixed(1)}% EXPOSURE</strong><p>20% hard cap / 10% autonomous sizing / 60% portfolio cap.</p></div>
     <div class="trade-agent"><span>VERIFIER</span><strong>PAPER BOUNDARY VERIFIED</strong><p>No seed phrase, signer, or live-order API exists.</p></div>`;
 }
 
@@ -524,6 +550,7 @@ function renderPaperPortfolio() {
   const prices=priceMap();
   const metrics=calculatePaperEquity(paperState,prices);
   const exposurePct=metrics.equity>0?(metrics.exposure/metrics.equity)*100:0;
+
   tradeEls.paperEquity.textContent=usd(metrics.equity);
   tradeEls.paperCash.textContent=usd(metrics.cash);
   tradeEls.paperPnl.textContent=`${metrics.unrealizedPnl>=0?'+':''}${usd(metrics.unrealizedPnl)}`;
@@ -534,14 +561,16 @@ function renderPaperPortfolio() {
   tradeEls.paperClosed.textContent=String(paperState.history.length);
   tradeEls.riskState.textContent=exposurePct>=55?'NEAR LIMIT':exposurePct>=35?'ELEVATED':'NOMINAL';
   tradeEls.riskState.className=exposurePct>=55?'risk-hot':exposurePct>=35?'risk-warm':'';
+
   if (!paperState.positions.length) {
     tradeEls.paperPositions.innerHTML='<tr><td colspan="8" class="empty-row">No paper positions open.</td></tr>';
   } else {
     tradeEls.paperPositions.innerHTML=paperState.positions.map((position)=>{
       const mark=prices[position.asset]||position.entryPrice;
       const pnl=calculatePaperPnl(position,mark);
+      const source=position.source==='AUTO'?'AUTO':'MANUAL';
       return `<tr>
-        <td><strong>${escapeHtml(position.asset)}</strong></td>
+        <td><strong>${escapeHtml(position.asset)}</strong><small class="source-chip ${source.toLowerCase()}">${source}</small></td>
         <td><span class="side-chip ${position.side.toLowerCase()}">${position.side}</span></td>
         <td>${price(position.entryPrice)}</td><td>${price(mark)}</td><td>${usd(position.notional)}</td>
         <td class="${pnl>=0?'positive-text':'negative-text'}">${pnl>=0?'+':''}${usd(pnl)}</td>
@@ -557,22 +586,32 @@ async function refreshMarketData({silent=false}={}) {
   if (!tradeEls.refreshMarket) return;
   tradeEls.refreshMarket.disabled=true;
   if (!silent) tradeEls.marketSource.textContent='REFRESHING…';
+
   try {
     const response=await fetch('/api/market',{headers:{accept:'application/json'}});
     const data=await response.json().catch(()=>({}));
     if (!response.ok) throw new Error(data.error||`Market HTTP ${response.status}`);
-    marketSnapshot={source:data.source||'public',updatedAt:data.updatedAt||new Date().toISOString(),assets:Array.isArray(data.assets)?data.assets:[]};
+    marketSnapshot={
+      source:data.source||'public',
+      updatedAt:data.updatedAt||new Date().toISOString(),
+      assets:Array.isArray(data.assets)?data.assets:[]
+    };
     tradeEls.marketSource.textContent=`LIVE / ${String(marketSnapshot.source).toUpperCase()}`;
     renderMarketStrip();
     await processPaperStops();
     renderPaperPortfolio();
     if (walletSnapshot) renderWalletResult();
+    return true;
   } catch (error) {
     marketSnapshot={source:'offline',updatedAt:null,assets:[]};
     tradeEls.marketSource.textContent='MARKET OFFLINE';
-    renderMarketStrip(); renderPaperPortfolio();
+    renderMarketStrip();
+    renderPaperPortfolio();
     if (!silent) toast(error?.message||'Market data unavailable.','error');
-  } finally { tradeEls.refreshMarket.disabled=false; }
+    return false;
+  } finally {
+    tradeEls.refreshMarket.disabled=false;
+  }
 }
 
 function renderWalletResult() {
@@ -590,40 +629,77 @@ function renderWalletResult() {
 async function loadPublicWallet() {
   const address=tradeEls.walletAddress.value.trim();
   if (!address) return toast('Enter a Solana public address.','error');
-  tradeEls.loadWallet.disabled=true; tradeEls.walletResult.textContent='Reading public balance…';
+  tradeEls.loadWallet.disabled=true;
+  tradeEls.walletResult.textContent='Reading public balance…';
+
   try {
     const response=await fetch(`/api/wallet?address=${encodeURIComponent(address)}`);
     const data=await response.json().catch(()=>({}));
     if (!response.ok) throw new Error(data.error||`Wallet HTTP ${response.status}`);
-    walletSnapshot=data; renderWalletResult(); renderTradeAgents(); toast('Public wallet balance loaded.');
+    walletSnapshot=data;
+    renderWalletResult();
+    renderTradeAgents();
+    toast('Public wallet balance loaded.');
   } catch (error) {
-    walletSnapshot=null; tradeEls.walletResult.textContent=error?.message||'Wallet lookup failed.';
-    renderTradeAgents(); toast(error?.message||'Wallet lookup failed.','error');
-  } finally { tradeEls.loadWallet.disabled=false; }
+    walletSnapshot=null;
+    tradeEls.walletResult.textContent=error?.message||'Wallet lookup failed.';
+    renderTradeAgents();
+    toast(error?.message||'Wallet lookup failed.','error');
+  } finally {
+    tradeEls.loadWallet.disabled=false;
+  }
+}
+
+function createPaperPosition({asset,side,notional,stopPct,takePct,source='MANUAL'}) {
+  const mark=Number(marketBySymbol(asset)?.price);
+  if (!Number.isFinite(mark)||mark<=0) {
+    if (source==='MANUAL') toast('Live market price required for paper execution.','error');
+    return { ok:false, error:'Live market price unavailable.' };
+  }
+
+  const metrics=calculatePaperEquity(paperState,priceMap());
+  const validation=validatePaperOrder({notional,equity:metrics.equity,exposure:metrics.exposure});
+  if (!validation.ok) {
+    if (source==='MANUAL') toast(validation.error,'error');
+    return { ok:false, error:validation.error };
+  }
+  if (notional>paperState.cash) {
+    const error='Not enough paper cash for this simulated position.';
+    if (source==='MANUAL') toast(error,'error');
+    return { ok:false, error };
+  }
+
+  const isShort=side==='SELL';
+  const position={
+    id:`P${Date.now().toString(36).toUpperCase()}`,
+    asset,
+    side,
+    notional,
+    entryPrice:mark,
+    stopLossPrice:isShort?mark*(1+stopPct/100):mark*(1-stopPct/100),
+    takeProfitPrice:isShort?mark*(1-takePct/100):mark*(1+takePct/100),
+    source,
+    createdAt:new Date().toISOString()
+  };
+
+  paperState.cash-=notional;
+  paperState.positions.push(position);
+  savePaperState();
+  renderPaperPortfolio();
+  return { ok:true, position };
 }
 
 function openPaperTrade() {
   const asset=tradeEls.paperAsset.value;
   const side=tradeEls.paperSide.value;
-  const mark=Number(marketBySymbol(asset)?.price);
-  if (!Number.isFinite(mark)||mark<=0) return toast('Live market price required for paper execution.','error');
   const notional=Number(tradeEls.paperNotional.value);
   const stopPct=Number(tradeEls.paperStop.value);
   const takePct=Number(tradeEls.paperTake.value);
+
   if (!(stopPct>0)||!(takePct>0)) return toast('Stop and take-profit percentages must be positive.','error');
-  const metrics=calculatePaperEquity(paperState,priceMap());
-  const validation=validatePaperOrder({notional,equity:metrics.equity,exposure:metrics.exposure});
-  if (!validation.ok) return toast(validation.error,'error');
-  if (notional>paperState.cash) return toast('Not enough paper cash for this simulated position.','error');
-  const isShort=side==='SELL';
-  const position={
-    id:`P${Date.now().toString(36).toUpperCase()}`,asset,side,notional,entryPrice:mark,
-    stopLossPrice:isShort?mark*(1+stopPct/100):mark*(1-stopPct/100),
-    takeProfitPrice:isShort?mark*(1-takePct/100):mark*(1+takePct/100),
-    createdAt:new Date().toISOString()
-  };
-  paperState.cash-=notional; paperState.positions.push(position); savePaperState(); renderPaperPortfolio();
-  toast(`${side} ${asset} paper position opened.`);
+
+  const result=createPaperPosition({asset,side,notional,stopPct,takePct,source:'MANUAL'});
+  if (result.ok) toast(`${side} ${asset} paper position opened.`);
 }
 
 function closePaperTrade(id,reason='MANUAL') {
@@ -632,22 +708,41 @@ function closePaperTrade(id,reason='MANUAL') {
   const position=paperState.positions[index];
   const mark=Number(marketBySymbol(position.asset)?.price)||position.entryPrice;
   const pnl=calculatePaperPnl(position,mark);
+
   paperState.cash+=Math.max(0,position.notional+pnl);
   paperState.positions.splice(index,1);
-  paperState.history.unshift({...position,exitPrice:mark,realizedPnl:pnl,reason,closedAt:new Date().toISOString()});
+  paperState.history.unshift({
+    ...position,
+    exitPrice:mark,
+    realizedPnl:pnl,
+    reason,
+    closedAt:new Date().toISOString()
+  });
   paperState.history=paperState.history.slice(0,100);
-  savePaperState(); renderPaperPortfolio(); toast(`${position.asset} paper position closed: ${reason}.`);
+  savePaperState();
+  renderPaperPortfolio();
+
+  if (autoAgentRunning && position.source==='AUTO') {
+    pushAutoAgentEvent(reason==='MANUAL'?'MANUAL CLOSE':'AUTO EXIT',`${position.asset} ${position.side} closed: ${reason}; PnL ${pnl>=0?'+':''}${usd(pnl)}.`);
+  }
+  toast(`${position.asset} paper position closed: ${reason}.`);
 }
 
 async function processPaperStops() {
   const prices=priceMap();
-  const triggers=paperState.positions.map((position)=>({position,reason:stopDecision(position,prices[position.asset])})).filter((item)=>item.reason);
+  const triggers=paperState.positions
+    .map((position)=>({position,reason:stopDecision(position,prices[position.asset])}))
+    .filter((item)=>item.reason);
+
   for (const trigger of triggers) closePaperTrade(trigger.position.id,trigger.reason);
 }
 
 function resetPaperPortfolio() {
   if (!confirm('Reset the local paper portfolio to $10,000? No real funds are involved.')) return;
-  paperState={cash:PAPER_STARTING_CASH,positions:[],history:[]}; savePaperState(); renderPaperPortfolio(); toast('Paper portfolio reset.');
+  paperState={cash:PAPER_STARTING_CASH,positions:[],history:[]};
+  savePaperState();
+  renderPaperPortfolio();
+  toast('Paper portfolio reset.');
 }
 
 function routeTradingSnapshot() {
@@ -657,7 +752,10 @@ function routeTradingSnapshot() {
   });
   const metrics=calculatePaperEquity(paperState,priceMap());
   const walletLine=walletSnapshot?`${walletSnapshot.sol.toFixed(6)} SOL (public-address read only)`:'not loaded';
-  const positions=paperState.positions.length?paperState.positions.map((p)=>`${p.side} ${p.asset} paper notional ${usd(p.notional)} @ ${price(p.entryPrice)}`).join('; '):'none';
+  const positions=paperState.positions.length
+    ?paperState.positions.map((p)=>`${p.side} ${p.asset} paper notional ${usd(p.notional)} @ ${price(p.entryPrice)}`).join('; ')
+    :'none';
+
   elements.objective.value=[
     'Analyze this crypto market snapshot as a PARALLAX research mission. This is PAPER TRADING ONLY: do not claim to execute real trades and do not request private keys or seed phrases.',
     '',
@@ -667,8 +765,152 @@ function routeTradingSnapshot() {
     '',
     'Use specialist agents to assess market regime, downside risks, invalidation conditions, and a conservative paper-trade plan. Separate observed data from assumptions.'
   ].join('\n');
-  updateCount(); elements.objective.scrollIntoView({behavior:'smooth',block:'center'}); elements.objective.focus();
+
+  updateCount();
+  elements.objective.scrollIntoView({behavior:'smooth',block:'center'});
+  elements.objective.focus();
   toast('Trading snapshot routed to mission input.');
+}
+
+function pushAutoAgentEvent(label,message) {
+  const stamp=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  autoAgentEvents.unshift({label,message,stamp});
+  autoAgentEvents=autoAgentEvents.slice(0,6);
+  renderAutoAgentLog();
+}
+
+function renderAutoAgentLog() {
+  if (!tradeEls.autoLog) return;
+  if (!autoAgentEvents.length) {
+    tradeEls.autoLog.innerHTML='<div><span>STANDBY</span><p>Agent is stopped. Start it to begin autonomous paper-trading scans.</p></div>';
+    return;
+  }
+  tradeEls.autoLog.innerHTML=autoAgentEvents.map((event)=>`
+    <div>
+      <span>${escapeHtml(event.stamp)} · ${escapeHtml(event.label)}</span>
+      <p>${escapeHtml(event.message)}</p>
+    </div>
+  `).join('');
+}
+
+function setAutoAgentUi(state) {
+  if (!tradeEls.autoConsole) return;
+  tradeEls.autoConsole.classList.toggle('running',state==='RUNNING'||state==='SCANNING');
+  tradeEls.autoConsole.classList.toggle('scanning',state==='SCANNING');
+  tradeEls.autoStatus.textContent=state;
+  tradeEls.autoStart.disabled=autoAgentRunning;
+  tradeEls.autoStop.disabled=!autoAgentRunning;
+  tradeEls.autoCadence.disabled=autoAgentRunning;
+  renderTradeAgents();
+}
+
+function updateAutoCountdown() {
+  if (!tradeEls.autoNext) return;
+  if (!autoAgentRunning || !autoAgentNextAt) {
+    tradeEls.autoNext.textContent='—';
+    return;
+  }
+  const seconds=Math.max(0,Math.ceil((autoAgentNextAt-Date.now())/1000));
+  tradeEls.autoNext.textContent=`${seconds}s`;
+}
+
+function scheduleNextAutoCycle() {
+  clearTimeout(autoAgentTimer);
+  clearInterval(autoAgentCountdownTimer);
+  if (!autoAgentRunning) return;
+
+  const cadence=Math.max(60,Number(tradeEls.autoCadence?.value)||60);
+  autoAgentNextAt=Date.now()+cadence*1000;
+  updateAutoCountdown();
+  autoAgentCountdownTimer=setInterval(updateAutoCountdown,1000);
+  autoAgentTimer=setTimeout(runAutonomousPaperCycle,cadence*1000);
+}
+
+async function runAutonomousPaperCycle() {
+  if (!autoAgentRunning || autoAgentBusy) return;
+  autoAgentBusy=true;
+  setAutoAgentUi('SCANNING');
+  tradeEls.autoNext.textContent='NOW';
+
+  try {
+    const marketOk=await refreshMarketData({silent:true});
+    if (!marketOk || !marketSnapshot.assets.length) {
+      tradeEls.autoDecision.textContent='NO DATA';
+      pushAutoAgentEvent('HOLD','Market data is unavailable; no paper order was created.');
+      return;
+    }
+
+    const decision=autonomousPaperDecision({
+      assets:marketSnapshot.assets,
+      state:paperState,
+      prices:priceMap(),
+      now:Date.now()
+    });
+
+    if (decision.action!=='OPEN') {
+      tradeEls.autoDecision.textContent='HOLD';
+      pushAutoAgentEvent('HOLD',decision.reason);
+      return;
+    }
+
+    const opened=createPaperPosition({
+      asset:decision.asset,
+      side:decision.side,
+      notional:decision.notional,
+      stopPct:decision.stopPct,
+      takePct:decision.takePct,
+      source:'AUTO'
+    });
+
+    if (!opened.ok) {
+      tradeEls.autoDecision.textContent='RISK BLOCK';
+      pushAutoAgentEvent('BLOCKED',opened.error||'Risk gate rejected the candidate.');
+      return;
+    }
+
+    autoAgentSessionTrades+=1;
+    tradeEls.autoTrades.textContent=String(autoAgentSessionTrades);
+    tradeEls.autoDecision.textContent=`${decision.side} ${decision.asset}`;
+    pushAutoAgentEvent(
+      'EXECUTED',
+      `${decision.side} ${decision.asset} paper position ${usd(decision.notional)} at ${price(opened.position.entryPrice)}. ${decision.reason}`
+    );
+  } catch (error) {
+    tradeEls.autoDecision.textContent='ERROR';
+    pushAutoAgentEvent('ERROR',error?.message||'Autonomous cycle failed.');
+  } finally {
+    autoAgentBusy=false;
+    if (autoAgentRunning) {
+      setAutoAgentUi('RUNNING');
+      scheduleNextAutoCycle();
+    } else {
+      setAutoAgentUi('STOPPED');
+    }
+  }
+}
+
+async function startAutonomousPaperAgent() {
+  if (autoAgentRunning) return;
+  autoAgentRunning=true;
+  autoAgentSessionTrades=0;
+  autoAgentEvents=[];
+  tradeEls.autoTrades.textContent='0';
+  tradeEls.autoDecision.textContent='INITIALIZING';
+  setAutoAgentUi('RUNNING');
+  pushAutoAgentEvent('START','Autonomous paper agent started. Market Agent → Risk Agent → Execution Agent is active.');
+  await runAutonomousPaperCycle();
+}
+
+function stopAutonomousPaperAgent() {
+  autoAgentRunning=false;
+  autoAgentBusy=false;
+  clearTimeout(autoAgentTimer);
+  clearInterval(autoAgentCountdownTimer);
+  autoAgentNextAt=0;
+  updateAutoCountdown();
+  tradeEls.autoDecision.textContent='STOPPED';
+  setAutoAgentUi('STOPPED');
+  pushAutoAgentEvent('STOP','Autonomous paper agent stopped. Existing paper positions remain protected by normal SL/TP checks while the page is open.');
 }
 
 tradeEls.refreshMarket?.addEventListener('click',()=>refreshMarketData());
@@ -677,7 +919,19 @@ tradeEls.walletAddress?.addEventListener('keydown',(event)=>{if(event.key==='Ent
 tradeEls.paperExecute?.addEventListener('click',openPaperTrade);
 tradeEls.paperReset?.addEventListener('click',resetPaperPortfolio);
 tradeEls.routeTradingMission?.addEventListener('click',routeTradingSnapshot);
-tradeEls.paperPositions?.addEventListener('click',(event)=>{const button=event.target.closest('[data-close-paper]');if(button)closePaperTrade(button.dataset.closePaper,'MANUAL');});
+tradeEls.autoStart?.addEventListener('click',startAutonomousPaperAgent);
+tradeEls.autoStop?.addEventListener('click',stopAutonomousPaperAgent);
+tradeEls.paperPositions?.addEventListener('click',(event)=>{
+  const button=event.target.closest('[data-close-paper]');
+  if (button) closePaperTrade(button.dataset.closePaper,'MANUAL');
+});
 
-renderMarketStrip(); renderPaperPortfolio(); refreshMarketData({silent:true});
-setInterval(()=>{if(document.visibilityState==='visible')refreshMarketData({silent:true});},30000);
+renderMarketStrip();
+renderPaperPortfolio();
+renderAutoAgentLog();
+setAutoAgentUi('STOPPED');
+refreshMarketData({silent:true});
+
+setInterval(()=>{
+  if (document.visibilityState==='visible') refreshMarketData({silent:true});
+},30000);
