@@ -459,7 +459,14 @@ const tradeEls = {
   interactionCycle: $('#interactionCycle'),
   interactionFlow: $('#interactionFlow'),
   interactionStream: $('#interactionStream'),
-  interactionStreamState: $('#interactionStreamState')
+  interactionStreamState: $('#interactionStreamState'),
+  cortexCharacter: $('#cortexCharacter'),
+  cortexSignal: $('#cortexSignal'),
+  cortexPersonaState: $('#cortexPersonaState'),
+  cortexPersonaMessage: $('#cortexPersonaMessage'),
+  cortexPerception: $('#cortexPerception'),
+  cortexRisk: $('#cortexRisk'),
+  cortexExecution: $('#cortexExecution')
 };
 
 const PAPER_STORAGE_KEY = 'parallax-paper-v1';
@@ -794,6 +801,46 @@ function routeTradingSnapshot() {
 }
 
 
+function setCortexPersona(stage='idle', message='') {
+  const labels={
+    idle:'DORMANT',
+    waking:'WAKING',
+    watch:'OBSERVING',
+    notice:'PATTERN LOCK',
+    propose:'FORMING HYPOTHESIS',
+    kill:'RISK GATE',
+    blocked:'VETO',
+    queue:'EXECUTING',
+    hold:'WATCHING',
+    complete:'MONITORING',
+    error:'FAULT'
+  };
+  const defaults={
+    idle:'Start the autonomous agent and CORTEX will wake up, observe the market, form proposals, survive the risk gate, and queue paper actions.',
+    waking:'Neural watch stack online. Establishing live market context.',
+    watch:'Reading the latest BTC, ETH and SOL snapshot.',
+    notice:'Searching for the strongest eligible market deviation.',
+    propose:'Turning observed market structure into a bounded paper-trade candidate.',
+    kill:'Testing the candidate against hard exposure, sizing and cooldown rules.',
+    blocked:'The candidate failed the risk gate. No paper capital is deployed.',
+    queue:'A surviving paper action is being committed to the simulated portfolio.',
+    hold:'No action survived this cycle. CORTEX remains on watch.',
+    complete:'Cycle complete. CORTEX is monitoring for the next scan.',
+    error:'The current cycle encountered an execution fault.'
+  };
+
+  if(tradeEls.cortexCharacter) tradeEls.cortexCharacter.dataset.stage=stage;
+  if(tradeEls.cortexPersonaState) tradeEls.cortexPersonaState.textContent=labels[stage]||String(stage).toUpperCase();
+  if(tradeEls.cortexPersonaMessage) tradeEls.cortexPersonaMessage.textContent=message||defaults[stage]||defaults.idle;
+  if(tradeEls.cortexSignal) tradeEls.cortexSignal.textContent=stage==='idle'?'DORMANT':stage==='error'?'FAULT':'LIVE';
+  if(tradeEls.cortexPerception) tradeEls.cortexPerception.textContent=
+    ['watch','notice','propose','kill','queue'].includes(stage)?'ACTIVE':stage==='idle'?'STANDBY':'MONITOR';
+  if(tradeEls.cortexRisk) tradeEls.cortexRisk.textContent=
+    stage==='blocked'?'VETO':stage==='kill'?'EVALUATING':'GUARDED';
+  if(tradeEls.cortexExecution) tradeEls.cortexExecution.textContent=
+    stage==='queue'?'PAPER ACTION':stage==='hold'?'NO TRADE':'PAPER ONLY';
+}
+
 function resetInteractionStages() {
   interactionStageState={watch:'idle',notice:'idle',propose:'idle',kill:'idle',queue:'idle'};
   renderInteractionFlow();
@@ -943,6 +990,7 @@ async function runAutonomousPaperCycle() {
 
   try {
     setInteractionStage('watch','active');
+    setCortexPersona('watch','Eyes open. Pulling a fresh BTC / ETH / SOL market snapshot.');
     pushInteractionEvent('WATCH','MARKET AGENT','Requesting a fresh BTC / ETH / SOL market snapshot.','live');
 
     const marketOk=await refreshMarketData({silent:true});
@@ -964,6 +1012,7 @@ async function runAutonomousPaperCycle() {
     const leader=strongestMarketCandidate();
     if (leader) {
       const change=Number(leader.change24h);
+      setCortexPersona('notice',`${leader.symbol} is the strongest observed deviation at ${change>=0?'+':''}${change.toFixed(2)}% over 24h.`);
       pushInteractionEvent(
         'NOTICE',
         'SIGNAL AGENT',
@@ -1004,6 +1053,7 @@ async function runAutonomousPaperCycle() {
       return;
     }
 
+    setCortexPersona('propose',`${decision.side} ${decision.asset} candidate formed at ${price(decision.entryPrice)} with bounded paper risk.`);
     pushInteractionEvent(
       'PROPOSE',
       'STRATEGY AGENT',
@@ -1016,6 +1066,7 @@ async function runAutonomousPaperCycle() {
     setInteractionStage('kill','active');
     const beforeMetrics=calculatePaperEquity(paperState,priceMap());
     const afterExposure=beforeMetrics.equity>0?((beforeMetrics.exposure+decision.notional)/beforeMetrics.equity)*100:0;
+    setCortexPersona('kill',`Risk gate inspecting ${decision.asset}: projected exposure ${afterExposure.toFixed(1)}%.`);
     pushInteractionEvent(
       'KILL',
       'RISK AGENT',
@@ -1051,6 +1102,7 @@ async function runAutonomousPaperCycle() {
     autoAgentSessionTrades+=1;
     tradeEls.autoTrades.textContent=String(autoAgentSessionTrades);
     tradeEls.autoDecision.textContent=`${decision.side} ${decision.asset}`;
+    setCortexPersona('queue',`${decision.side} ${decision.asset} survived the gate. Simulated position is now live.`);
     pushInteractionEvent(
       'QUEUE',
       'EXECUTION AGENT',
@@ -1064,6 +1116,7 @@ async function runAutonomousPaperCycle() {
     );
   } catch (error) {
     tradeEls.autoDecision.textContent='ERROR';
+    setCortexPersona('error',error?.message||'Autonomous cycle failed.');
     if (tradeEls.interactionStreamState) tradeEls.interactionStreamState.textContent='ERROR';
     pushInteractionEvent('SYSTEM','PARALLAX',error?.message||'Autonomous cycle failed.','blocked');
     pushAutoAgentEvent('ERROR',error?.message||'Autonomous cycle failed.');
@@ -1093,6 +1146,7 @@ async function startAutonomousPaperAgent() {
   tradeEls.autoTrades.textContent='0';
   tradeEls.autoDecision.textContent='INITIALIZING';
   setAutoAgentUi('RUNNING');
+  setCortexPersona('waking');
   pushAutoAgentEvent('START','Autonomous paper agent started. Market Agent → Risk Agent → Execution Agent is active.');
   pushInteractionEvent('SYSTEM','ORCHESTRATOR','Autonomous session started. Observable decision events will stream here in real time.','complete');
   await runAutonomousPaperCycle();
@@ -1107,6 +1161,7 @@ function stopAutonomousPaperAgent() {
   updateAutoCountdown();
   tradeEls.autoDecision.textContent='STOPPED';
   setAutoAgentUi('STOPPED');
+  setCortexPersona('idle');
   pushAutoAgentEvent('STOP','Autonomous paper agent stopped. Existing paper positions remain protected by normal SL/TP checks while the page is open.');
   if (tradeEls.interactionStreamState) tradeEls.interactionStreamState.textContent='STOPPED';
   tradeEls.interactionPanel?.classList.remove('live');
@@ -1132,6 +1187,7 @@ renderAutoAgentLog();
 renderInteractionStream();
 resetInteractionStages();
 setAutoAgentUi('STOPPED');
+setCortexPersona('idle');
 refreshMarketData({silent:true});
 
 setInterval(()=>{

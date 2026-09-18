@@ -1,9 +1,9 @@
 {
   "name": "parallax-agent-ops",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "private": true,
   "type": "module",
-  "description": "A zero-dependency multi-agent operations console with live AI orchestration, crypto intelligence, autonomous paper trading, and visible agent interaction streams.",
+  "description": "A zero-dependency multi-agent operations console with live AI orchestration, crypto intelligence, autonomous paper trading, visible agent interaction, and the reactive PARALLAX CORTEX persona.",
   "scripts": {
     "dev": "node scripts/local-server.js",
     "build": "node scripts/build.mjs",

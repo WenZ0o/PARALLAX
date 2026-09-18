@@ -5,7 +5,7 @@
 <p align="center"><strong>One objective. Parallel specialists. Adversarial verification. A usable artifact.</strong></p>
 
 <p align="center">
-  <code>DEMO MODE</code> · <code>LIVE AI</code> · <code>PARALLEL AGENTS</code> · <code>CRYPTO INTELLIGENCE</code> · <code>PAPER TRADING</code>
+  <code>DEMO MODE</code> · <code>LIVE AI</code> · <code>PARALLEL AGENTS</code> · <code>CRYPTO INTELLIGENCE</code> · <code>PARALLAX CORTEX</code>
 </p>
 
 PARALLAX is a zero-dependency multi-agent operations console that makes orchestration visible instead of hiding it behind a chat box. A mission is decomposed by a planner, executed by independent specialists, audited by a separate verifier, and merged into a final synthesis.
@@ -41,6 +41,16 @@ OBJECTIVE → BRIEF → PLAN
 </p>
 
 Planning, execution, verification, and synthesis are separate stages. Trading context can be routed into the same graph without giving the application custody or signing authority.
+
+## PARALLAX CORTEX
+
+<p align="center">
+  <img src="assets/parallax-cortex.webp" alt="PARALLAX CORTEX — autonomous agent visual identity" width="72%" />
+</p>
+
+**PARALLAX CORTEX** is the visual persona of the autonomous trading agent. The live site uses this artwork as a reactive character rather than a static mascot: it wakes when the agent starts, scans while WATCH / NOTICE is active, changes state at the KILL risk gate, and flashes when a paper action reaches QUEUE.
+
+The character is connected to the same observable event pipeline shown in the interaction stream. It represents structured system state and visible actions, not hidden chain-of-thought.
 
 ## Trading Module
 
@@ -171,6 +181,7 @@ PARALLAX/
 │   ├── parallax-how-it-works.webp
 │   ├── parallax-system-architecture.webp
 │   ├── parallax-trading-module.webp
+│   ├── parallax-cortex.webp
 │   ├── parallax-agents-live.svg
 │   └── parallax-logo.svg
 ├── lib/
